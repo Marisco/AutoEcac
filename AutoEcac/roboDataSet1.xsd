@@ -1,0 +1,39 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="roboDataSet" targetNamespace="http://tempuri.org/roboDataSet1.xsd" xmlns:mstns="http://tempuri.org/roboDataSet1.xsd" xmlns="http://tempuri.org/roboDataSet1.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" xmlns:msprop="urn:schemas-microsoft-com:xml-msprop" attributeFormDefault="qualified" elementFormDefault="qualified">
+  <xs:annotation>
+    <xs:appinfo source="urn:schemas-microsoft-com:xml-msdatasource">
+      <DataSource DefaultConnectionIndex="0" FunctionsComponentName="QueriesTableAdapter" Modifier="AutoLayout, AnsiClass, Class, Public" SchemaSerializationMode="IncludeSchema" xmlns="urn:schemas-microsoft-com:xml-msdatasource">
+        <Connections>
+          <Connection AppSettingsObjectName="Settings" AppSettingsPropertyName="roboConnectionString" ConnectionStringObject="" IsAppSettingsProperty="true" Modifier="Assembly" Name="roboConnectionString (Settings)" ParameterPrefix="@" PropertyReference="ApplicationSettings.AutoEcac.Properties.Settings.GlobalReference.Default.roboConnectionString" Provider="MySql.Data.MySqlClient" />
+        </Connections>
+        <Tables>
+          <TableAdapter BaseClass="System.ComponentModel.Component" DataAccessorModifier="AutoLayout, AnsiClass, Class, Public" DataAccessorName="tsiscomexweb_roboTableAdapter" GeneratorDataComponentClassName="tsiscomexweb_roboTableAdapter" Name="tsiscomexweb_robo" UserDataComponentName="tsiscomexweb_roboTableAdapter">
+            <MainSource>
+              <DbSource ConnectionRef="roboConnectionString (Settings)" DbObjectName="robo.tsiscomexweb_robo" DbObjectType="Table" FillMethodModifier="Public" FillMethodName="Fill" GenerateMethods="Both" GenerateShortCommands="true" GeneratorGetMethodName="GetData" GeneratorSourceName="Fill" GetMethodModifier="Public" GetMethodName="GetData" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetData" UserSourceName="Fill">
+                <SelectCommand>
+                  <DbCommand CommandType="Text" ModifiedByUser="false">
+                    <CommandText>SELECT nr_sequencia, nr_processo, nr_registro_di, tp_consulta, tp_acao, dt_agendamento, dt_realizacao, dt_registro_di, nr_tentativas, tx_erro, cd_usuario, cpf_certificado, in_rodando, xml_comando, xml_retorno FROM tsiscomexweb_robo</CommandText>
+                    <Parameters />
+                  </DbCommand>
+                </SelectCommand>
+              </DbSource>
+            </MainSource>
+            <Mappings />
+            <Sources />
+          </TableAdapter>
+        </Tables>
+        <Sources />
+      </DataSource>
+    </xs:appinfo>
+  </xs:annotation>
+  <xs:element name="roboDataSet" msdata:IsDataSet="true" msdata:UseCurrentLocale="true" msprop:EnableTableAdapterManager="True" msprop:Generator_DataSetName="roboDataSet" msprop:Generator_UserDSName="roboDataSet">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="tsiscomexweb_robo" msprop:Generator_TableClassName="tsiscomexweb_roboDataTable" msprop:Generator_TableVarName="tabletsiscomexweb_robo" msprop:Generator_TablePropName="tsiscomexweb_robo" msprop:Generator_RowDeletingName="tsiscomexweb_roboRowDeleting" msprop:Generator_RowChangingName="tsiscomexweb_roboRowChanging" msprop:Generator_RowEvHandlerName="tsiscomexweb_roboRowChangeEventHandler" msprop:Generator_RowDeletedName="tsiscomexweb_roboRowDeleted" msprop:Generator_UserTableName="tsiscomexweb_robo" msprop:Generator_RowChangedName="tsiscomexweb_roboRowChanged" msprop:Generator_RowEvArgName="tsiscomexweb_roboRowChangeEvent" msprop:Generator_RowClassName="tsiscomexweb_roboRow">
+          <xs:complexType>
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>
