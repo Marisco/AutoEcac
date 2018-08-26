@@ -24,8 +24,10 @@ namespace AutoEcac
         public frmAutoEcac()
         {
             InitializeComponent();
+			btnServico.Enabled = false;
+			cbxBancoDados.Checked = false;
 
-            conectarBanco();
+            //conectarBanco();
 
             Browser = ConfigurarBrowser();
 
@@ -39,12 +41,22 @@ namespace AutoEcac
             using (MySqlConnection mysql = new MySqlConnection(connStr))
             {
                 mysql.Open();
-                MySqlCommand command = new MySqlCommand("Select * from TSISCOMEXWEB_ROBO", mysql);
+                MySqlCommand command = new MySqlCommand("Select * from TSISCOMEXWEB_ROBO where tp_consulta = 'DI' and tp_acao = 'consulta' and in_rodando = 1", mysql);
                 MySqlDataReader rdr = command.ExecuteReader();
+
+				dgvNrDelacaracao.Rows.Clear();
+
+				
                 while (rdr.Read())
                 {
-                    Console.WriteLine(rdr.GetString("tp_consulta") + " -- " + rdr[1] + " --- " + rdr[2] + "----" + rdr[0]);
-                }
+                    //Console.WriteLine(rdr.GetString("tp_consulta") + " -- " + rdr[1] + " --- " + rdr[2] + "----" + rdr[0]);
+
+					dgvNrDelacaracao.Rows.Add(rdr.GetString("nr_registro_di"));
+
+
+
+
+				}
                 mysql.Close();
             }
 
@@ -268,10 +280,16 @@ namespace AutoEcac
 
                 Thread.Sleep(2000);
                 Browser.Navigate().Back();
+
+				//antes de limpar fazer update no banco
+
+
                 dgvNrDelacaracao.Rows.Clear();
 
-
-                MessageBox.Show("Consulta realizada com sucesso!", "Auto-Ecac", MessageBoxButtons.OK, MessageBoxIcon.Information);
+				if (!cbxBancoDados.Checked)
+				{
+					MessageBox.Show("Consulta realizada com sucesso!", "Auto-Ecac", MessageBoxButtons.OK, MessageBoxIcon.Information);
+				}
             }
         }
 
@@ -407,7 +425,68 @@ namespace AutoEcac
             get { return (Periodo)cbxperiodo.SelectedIndex; }
         }
 
-        #endregion
+		#endregion
 
-    }
+		
+
+		private void cbxBancoDados_Click(object sender, EventArgs e)
+		{
+			if (cbxBancoDados.Enabled)
+			{
+				rbConsultaDI.Checked = true;
+				rdbNrDeclaracao.Checked = true;
+
+				dgvNrDelacaracao.Enabled = true; // rdbNrDeclaracao.Checked;
+				
+				btnAdicionar.Enabled = false;
+				edtNrConsultaDI.Enabled = false;
+				btnServico.Enabled = true;
+
+				grpDatas.Enabled = false;
+
+				if (!grpDatas.Enabled)
+				{
+					dtpInicial.Value = DateTime.Now;
+					dtpFinal.Value = DateTime.Now;
+					cbxperiodo.SelectedIndex = (int)Periodo.DIARIO;
+					grpDatas.Enabled = false;
+				}
+			}
+			else
+			{
+				dgvNrDelacaracao.Enabled = true; // rdbNrDeclaracao.Checked;
+				btnAdicionar.Enabled = true;
+				edtNrConsultaDI.Enabled = true;
+				btnServico.Enabled = false;
+
+
+				grpDatas.Enabled = true;
+
+				if (!grpDatas.Enabled)
+				{
+					dtpInicial.Value = DateTime.Now;
+					dtpFinal.Value = DateTime.Now;
+					cbxperiodo.SelectedIndex = (int)Periodo.DIARIO;
+					grpDatas.Enabled = false;
+				}
+
+
+
+
+			}
+		}
+
+		private void btnServico_Click(object sender, EventArgs e)
+		{
+			tempo.Enabled = true;
+			
+		}
+
+		private void tempo_Tick(object sender, EventArgs e)
+		{
+			conectarBanco();
+			btnOK_Click(sender,e);
+			
+		}
+	}
 }

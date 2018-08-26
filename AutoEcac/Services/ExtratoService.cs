@@ -183,7 +183,7 @@ namespace AutoEcac.Servicos
             foreach (DateTime data in LoopNoPeriodo(pDtInicial, pDtFinal))
             {
 
-                Thread.Sleep(1000);               
+                Thread.Sleep(2000);               
 
                 foreach (string numero in pNrConsulta)
                 {
@@ -207,7 +207,7 @@ namespace AutoEcac.Servicos
                             break;
                     }
 
-                    Thread.Sleep(1000);
+                    Thread.Sleep(2000);
 
                     if (pTipoConsultaExtrato != TipoConsultaExtrato.NumeroDeclaracao)
                     {
@@ -218,11 +218,11 @@ namespace AutoEcac.Servicos
                         Thread.Sleep(1000);
 
                         _browser.FindElement(By.Name("fimConsulta")).SendKeys(_dtFinal.ToShortDateString().Trim().Replace("/", ""));
-                        Thread.Sleep(1000);
+                        Thread.Sleep(2000);
                     }
 
                     _browser.FindElement(By.Name("enviar")).Click();
-                    Thread.Sleep(1000);
+                    Thread.Sleep(2000);
 
                     if (pTipoConsultaExtrato != TipoConsultaExtrato.NumeroDeclaracao)
                     {
@@ -323,6 +323,13 @@ namespace AutoEcac.Servicos
                         DI.AppendChild(DIChild);
 
                         bEmitirComnprovante = tdCollection[1].Text.Trim() == "DECLARACAO DESEMBARACADA";
+
+						/*
+						if (!bEmitirComnprovante)
+						{
+							Console.WriteLine(tdCollection[1].Text);
+						}
+						*/
 
                         for (int i = 1; i < 10; i++)
                         {
