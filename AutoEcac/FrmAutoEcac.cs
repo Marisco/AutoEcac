@@ -179,9 +179,31 @@ namespace AutoEcac
             rdbNrDeclaracao.PerformClick();
         }
 
-        #region Eventos Clicks
+		private void GravarnoBanco(string nrdeclaracoes)
+		{
 
-        private void btnOK_Click(object sender, EventArgs e)
+			if (nrdeclaracoes.Length > 0)
+			{
+				nrdeclaracoes = nrdeclaracoes.Substring(0, nrdeclaracoes.Length - 1);
+			}
+
+
+			string connStr = ConfigurationManager.ConnectionStrings["myConnectionString"].ConnectionString;
+
+			using (MySqlConnection mysql = new MySqlConnection(connStr))
+			{
+				mysql.Open();
+				MySqlCommand command = new MySqlCommand("Update TSISCOMEXWEB_ROBO set in_rodando=0 where tp_consulta = 'DI' and tp_acao = 'consulta' and nr_registro_di in(" + nrdeclaracoes + ")", mysql);
+
+				command.ExecuteNonQuery();
+
+
+				mysql.Close();
+			}
+		}
+			#region Eventos Clicks
+
+			private void btnOK_Click(object sender, EventArgs e)
         {
             Boolean PerfilValido = AlterarPerfil();
 
@@ -282,9 +304,21 @@ namespace AutoEcac
                 Browser.Navigate().Back();
 
 				//antes de limpar fazer update no banco
+                
+				string nrdeclaracoes = string.Empty;
 
+				for (int i = 0; i < dgvNrDelacaracao.RowCount; i++)
+				{
+					nrdeclaracoes += "'" + dgvNrDelacaracao.Rows[i].Cells[0].Value + "',";
+				}
 
-                dgvNrDelacaracao.Rows.Clear();
+				if (!string.IsNullOrEmpty(nrdeclaracoes))
+				{
+					GravarnoBanco(nrdeclaracoes);
+
+				}
+
+				dgvNrDelacaracao.Rows.Clear();
 
 				if (!cbxBancoDados.Checked)
 				{
@@ -488,5 +522,7 @@ namespace AutoEcac
 			btnOK_Click(sender,e);
 			
 		}
+
+		
 	}
 }
