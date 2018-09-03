@@ -1,4 +1,5 @@
-﻿using AutoEcac.Services;
+﻿using AutoEcac.DAL;
+using AutoEcac.Services;
 using AutoEcac.Utils;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Interactions;
@@ -17,10 +18,13 @@ namespace AutoEcac.Servicos
     {
         private string _NmArquivoNovo;
         private IWebDriver _browser;
+        private roboEntities _db;
 
-        public ExtratoService(IWebDriver browser)
+        public ExtratoService(IWebDriver browser, roboEntities db)
         {
             _browser = browser;
+            _db = db;
+
         }
 
         public void NavegarURLExtratoDeclaracaoDI()
@@ -182,8 +186,7 @@ namespace AutoEcac.Servicos
             base._periodo = pPeriodo;
             foreach (DateTime data in LoopNoPeriodo(pDtInicial, pDtFinal))
             {
-
-                Thread.Sleep(2000);               
+                Thread.Sleep(2000);
 
                 foreach (string numero in pNrConsulta)
                 {
@@ -230,6 +233,9 @@ namespace AutoEcac.Servicos
                         Thread.Sleep(2000);
                         ConsultarDI(pPeriodo, 0, vListaDI, DateTime.Now, DateTime.Now);
                     }
+                    int nrRegistroDi = Int32.Parse(numero);
+                    tsiscomexweb_robo registro = _db.tsiscomexweb_robo.OrderByDescending(reg => reg.nr_sequencia).Where(reg => reg.nr_registro_di == nrRegistroDi).First();
+
 
                     try
                     {
@@ -238,18 +244,22 @@ namespace AutoEcac.Servicos
                         _NmArquivoPadrao = numero + ".xml";
                         _NmArquivoNovo = numero + "_declaracao.xml";
                         SalvarArquivosBaixados(_NmArquivoNovo, this.DiretorioCompleto);
-                        Thread.Sleep(1000);
+                        Thread.Sleep(2000);
 
+                        var arquivo = System.IO.File.ReadAllText(this.DiretorioCompleto + "\\" + _NmArquivoNovo);
+                        registro.xml_retorno = arquivo;
 
                         _browser.FindElement(By.Id("btnRegistrarDI")).Click();
                         Thread.Sleep(2000);
                         _NmArquivoPadrao = "Extrato.pdf";
                         _NmArquivoNovo = numero + "_extrato.pdf";
                         SalvarArquivosBaixados(_NmArquivoNovo, this.DiretorioCompleto);
-                        Thread.Sleep(1000);
+                        Thread.Sleep(2000);
 
+                        var arquivoPdf = System.IO.File.ReadAllBytes(this.DiretorioCompleto + "\\" + _NmArquivoNovo);
+                        registro.pdf_extrato = arquivoPdf;
 
-                        if (gerarXmlAcompanhamento(numero))
+                        if (gerarXmlAcompanhamento(numero, ref registro))
                         {
                             _browser.FindElement(By.Id("btnComprovanteDI")).Click();
                             Thread.Sleep(1000);
@@ -259,9 +269,13 @@ namespace AutoEcac.Servicos
                             _NmArquivoPadrao = "COMPROVANTE_DI.pdf";
                             _NmArquivoNovo = numero + "_comprovante.pdf";
                             SalvarArquivosBaixados(_NmArquivoNovo, this.DiretorioCompleto);
+                            Thread.Sleep(2000);
+
+                            arquivoPdf = System.IO.File.ReadAllBytes(this.DiretorioCompleto + "\\" + _NmArquivoNovo);
+                            registro.pdf_comprovante = arquivoPdf;
+
                             _browser.Close();
                             _browser.SwitchTo().Window(_browser.WindowHandles.First());
-
 
                         }
                         _browser.Navigate().Back();
@@ -269,7 +283,7 @@ namespace AutoEcac.Servicos
                         _browser.Navigate().Back();
 
                     }
-                    catch (Exception)
+                    catch (Exception e)
                     {
                         Thread.Sleep(1000);
                         try
@@ -283,13 +297,13 @@ namespace AutoEcac.Servicos
                             // throw;
                         }
                     }
-
-                }               
+                }
             }
             pNrConsulta.Clear();
+            _db.SaveChanges();
         }
 
-        private Boolean gerarXmlAcompanhamento(string pNumerorDi)
+        private Boolean gerarXmlAcompanhamento(string pNumerorDi, ref tsiscomexweb_robo pRegistro)
         {
             Boolean bEmitirComnprovante = false;
 
@@ -324,12 +338,12 @@ namespace AutoEcac.Servicos
 
                         bEmitirComnprovante = tdCollection[1].Text.Trim() == "DECLARACAO DESEMBARACADA";
 
-						/*
-						if (!bEmitirComnprovante)
-						{
-							Console.WriteLine(tdCollection[1].Text);
-						}
-						*/
+                        /*
+                        if (!bEmitirComnprovante)
+                        {
+                            Console.WriteLine(tdCollection[1].Text);
+                        }
+                        */
 
                         for (int i = 1; i < 10; i++)
                         {
@@ -387,8 +401,62 @@ namespace AutoEcac.Servicos
 
             XmlTextWriter writer = new XmlTextWriter(this.DiretorioCompleto + "\\" + pNumerorDi + "_situacao.xml", null);
             vXmlAcompanhamento.Save(writer);
+            writer.Close();
+
+            Thread.Sleep(2000);
+
+            if (!bEmitirComnprovante)
+            {
+                var arquivo = System.IO.File.ReadAllText(this.DiretorioCompleto + "\\" + pNumerorDi + "_situacao.xml");
+                pRegistro.xml_comando = arquivo;
+                pRegistro.in_desembaraco = 0;
+                pRegistro.in_rodando = 0;
+
+                if (pRegistro.tp_acao != "acompanha")
+                {
+                    tsiscomexweb_robo novoRegistro = new tsiscomexweb_robo();
+                    novoRegistro.nr_processo = pRegistro.nr_processo;
+                    novoRegistro.nr_registro_di = pRegistro.nr_registro_di;
+                    novoRegistro.nr_seq = pRegistro.nr_seq;
+                    novoRegistro.tp_consulta = pRegistro.tp_consulta;
+                    novoRegistro.tp_acao = "acompanha";
+                    novoRegistro.dt_agendamento = DateTime.Now.AddMinutes(30);
+                    novoRegistro.dt_realizacao = DateTime.Now;
+                    novoRegistro.dt_registro_di = pRegistro.dt_registro_di;
+                    novoRegistro.nr_tentativas = 1;
+                    novoRegistro.tx_erro = "";
+                    novoRegistro.cd_usuario = pRegistro.cd_usuario;
+                    novoRegistro.cpf_certificado = pRegistro.cpf_certificado;
+                    novoRegistro.in_rodando = 1;
+                    novoRegistro.in_desembaraco = 0;
+                    novoRegistro.tp_anuencia = pRegistro.tp_anuencia;
+                    novoRegistro.in_situacao = 0;
+                    novoRegistro.xml_comando = "";
+                    novoRegistro.xml_retorno = "";
+                    novoRegistro.pdf_comprovante = null;
+                    novoRegistro.pdf_extrato = null;
+                    _db.tsiscomexweb_robo.Add(novoRegistro);
+
+                }
+                else
+                {
+                    pRegistro.dt_realizacao = DateTime.Now;
+                    pRegistro.dt_agendamento = DateTime.Now.AddMinutes(30);
+                    pRegistro.nr_tentativas = pRegistro.nr_tentativas++;
+                }
+            }
+            else
+            {
+                var arquivo = System.IO.File.ReadAllText(this.DiretorioCompleto + "\\" + pNumerorDi + "_situacao.xml");
+                pRegistro.xml_comando = arquivo;
+                pRegistro.dt_realizacao = DateTime.Now;
+                pRegistro.in_desembaraco = 1;
+                pRegistro.in_rodando = 0;
+            }
+
             _browser.Close();
             _browser.SwitchTo().Window(_browser.WindowHandles.First());
+
             return bEmitirComnprovante;
         }
 
@@ -574,6 +642,8 @@ namespace AutoEcac.Servicos
         {
             _browser.Navigate().GoToUrl(URL_EXTRATO_LOGIN);
             _browser.FindElement(By.XPath("//img[contains(@src,'certificado')]")).Click();
+
+
         }
     }
 }

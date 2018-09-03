@@ -1,4 +1,5 @@
-﻿using AutoEcac.Utils;
+﻿using AutoEcac.DAL;
+using AutoEcac.Utils;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -16,6 +17,7 @@ namespace AutoEcac.Services
 
         public TipoServico _tipoServicoSelecionado;
         public TipoExtrato _tipoExtratoSelecionado { get; set; }
+        
 
         //Configuração de Arquivos
         protected string _NmArquivoPadrao;
@@ -24,6 +26,7 @@ namespace AutoEcac.Services
         protected Periodo _periodo;
         protected DateTime _dtInicial;
         protected DateTime _dtFinal;
+        
 
         protected IEnumerable<DateTime> LoopNoPeriodo(DateTime pDtInicial, DateTime pDtFinal)
         {

@@ -1,0 +1,222 @@
+{
+  "version": 3,
+  "targets": {
+    ".NETFramework,Version=v4.6.1": {
+      "AutoItX.Dotnet/3.3.14.2": {
+        "type": "package",
+        "compile": {
+          "lib/AutoItX3.Assembly.dll": {}
+        },
+        "runtime": {
+          "lib/AutoItX3.Assembly.dll": {}
+        },
+        "build": {
+          "build/AutoItX.Dotnet.targets": {}
+        }
+      },
+      "EntityFramework/6.2.0": {
+        "type": "package",
+        "frameworkAssemblies": [
+          "System.ComponentModel.DataAnnotations"
+        ],
+        "compile": {
+          "lib/net45/EntityFramework.SqlServer.dll": {},
+          "lib/net45/EntityFramework.dll": {}
+        },
+        "runtime": {
+          "lib/net45/EntityFramework.SqlServer.dll": {},
+          "lib/net45/EntityFramework.dll": {}
+        }
+      }
+    },
+    ".NETFramework,Version=v4.6.1/win": {
+      "AutoItX.Dotnet/3.3.14.2": {
+        "type": "package",
+        "compile": {
+          "lib/AutoItX3.Assembly.dll": {}
+        },
+        "runtime": {
+          "lib/AutoItX3.Assembly.dll": {}
+        },
+        "build": {
+          "build/AutoItX.Dotnet.targets": {}
+        }
+      },
+      "EntityFramework/6.2.0": {
+        "type": "package",
+        "frameworkAssemblies": [
+          "System.ComponentModel.DataAnnotations"
+        ],
+        "compile": {
+          "lib/net45/EntityFramework.SqlServer.dll": {},
+          "lib/net45/EntityFramework.dll": {}
+        },
+        "runtime": {
+          "lib/net45/EntityFramework.SqlServer.dll": {},
+          "lib/net45/EntityFramework.dll": {}
+        }
+      }
+    },
+    ".NETFramework,Version=v4.6.1/win-x64": {
+      "AutoItX.Dotnet/3.3.14.2": {
+        "type": "package",
+        "compile": {
+          "lib/AutoItX3.Assembly.dll": {}
+        },
+        "runtime": {
+          "lib/AutoItX3.Assembly.dll": {}
+        },
+        "build": {
+          "build/AutoItX.Dotnet.targets": {}
+        }
+      },
+      "EntityFramework/6.2.0": {
+        "type": "package",
+        "frameworkAssemblies": [
+          "System.ComponentModel.DataAnnotations"
+        ],
+        "compile": {
+          "lib/net45/EntityFramework.SqlServer.dll": {},
+          "lib/net45/EntityFramework.dll": {}
+        },
+        "runtime": {
+          "lib/net45/EntityFramework.SqlServer.dll": {},
+          "lib/net45/EntityFramework.dll": {}
+        }
+      }
+    },
+    ".NETFramework,Version=v4.6.1/win-x86": {
+      "AutoItX.Dotnet/3.3.14.2": {
+        "type": "package",
+        "compile": {
+          "lib/AutoItX3.Assembly.dll": {}
+        },
+        "runtime": {
+          "lib/AutoItX3.Assembly.dll": {}
+        },
+        "build": {
+          "build/AutoItX.Dotnet.targets": {}
+        }
+      },
+      "EntityFramework/6.2.0": {
+        "type": "package",
+        "frameworkAssemblies": [
+          "System.ComponentModel.DataAnnotations"
+        ],
+        "compile": {
+          "lib/net45/EntityFramework.SqlServer.dll": {},
+          "lib/net45/EntityFramework.dll": {}
+        },
+        "runtime": {
+          "lib/net45/EntityFramework.SqlServer.dll": {},
+          "lib/net45/EntityFramework.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "AutoItX.Dotnet/3.3.14.2": {
+      "sha512": "9KbJxAeq2ev7r3DTeyu7EXvgipQYM+MLUchEXyb/99qhQKqSUfr+f0L5cguSNBq1461CPzL7YMvVircLhCV8jQ==",
+      "type": "package",
+      "path": "autoitx.dotnet/3.3.14.2",
+      "files": [
+        "autoitx.dotnet.3.3.14.2.nupkg.sha512",
+        "autoitx.dotnet.nuspec",
+        "build/AutoItX.Dotnet.targets",
+        "build/AutoItX3.dll",
+        "build/AutoItX3_x64.dll",
+        "lib/AutoItX3.Assembly.dll",
+        "lib/AutoItX3.Assembly.xml"
+      ]
+    },
+    "EntityFramework/6.2.0": {
+      "sha512": "ptGyXOf26qLrtn+2doAmylIlCxOnBJANwlyyLrXDmqIk9O18IzLWHyxDwwAyhgXkxmbiaA0WNpRy67WRReInBw==",
+      "type": "package",
+      "path": "entityframework/6.2.0",
+      "files": [
+        "content/net40/App.config.transform",
+        "content/net40/Web.config.transform",
+        "entityframework.6.2.0.nupkg.sha512",
+        "entityframework.nuspec",
+        "lib/net40/EntityFramework.SqlServer.dll",
+        "lib/net40/EntityFramework.SqlServer.xml",
+        "lib/net40/EntityFramework.dll",
+        "lib/net40/EntityFramework.xml",
+        "lib/net45/EntityFramework.SqlServer.dll",
+        "lib/net45/EntityFramework.SqlServer.xml",
+        "lib/net45/EntityFramework.dll",
+        "lib/net45/EntityFramework.xml",
+        "tools/EntityFramework.PowerShell.Utility.dll",
+        "tools/EntityFramework.PowerShell.dll",
+        "tools/EntityFramework.psd1",
+        "tools/EntityFramework.psm1",
+        "tools/about_EntityFramework.help.txt",
+        "tools/init.ps1",
+        "tools/install.ps1",
+        "tools/migrate.exe"
+      ]
+    }
+  },
+  "projectFileDependencyGroups": {
+    ".NETFramework,Version=v4.6.1": [
+      "AutoItX.Dotnet >= 3.3.14.2",
+      "EntityFramework >= 6.2.0"
+    ]
+  },
+  "packageFolders": {
+    "C:\\Users\\chmar\\.nuget\\packages\\": {}
+  },
+  "project": {
+    "version": "1.0.0",
+    "restore": {
+      "projectUniqueName": "C:\\_Kestra\\AutoEcac\\AutoEcac.csproj",
+      "projectName": "AutoEcac",
+      "projectPath": "C:\\_Kestra\\AutoEcac\\AutoEcac.csproj",
+      "packagesPath": "C:\\Users\\chmar\\.nuget\\packages\\",
+      "outputPath": "C:\\_Kestra\\AutoEcac\\obj\\",
+      "projectStyle": "PackageReference",
+      "skipContentFileWrite": true,
+      "configFilePaths": [
+        "C:\\Users\\chmar\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+      ],
+      "originalTargetFrameworks": [
+        "net461"
+      ],
+      "sources": {
+        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+        "https://api.nuget.org/v3/index.json": {}
+      },
+      "frameworks": {
+        "net461": {
+          "projectReferences": {}
+        }
+      }
+    },
+    "frameworks": {
+      "net461": {
+        "dependencies": {
+          "AutoItX.Dotnet": {
+            "target": "Package",
+            "version": "[3.3.14.2, )"
+          },
+          "EntityFramework": {
+            "target": "Package",
+            "version": "[6.2.0, )"
+          }
+        }
+      }
+    },
+    "runtimes": {
+      "win": {
+        "#import": []
+      },
+      "win-x64": {
+        "#import": []
+      },
+      "win-x86": {
+        "#import": []
+      }
+    }
+  }
+}
