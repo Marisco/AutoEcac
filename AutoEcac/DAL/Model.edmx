@@ -1,10 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+<edmx:Edmx Version="1.0" xmlns:edmx="http://schemas.microsoft.com/ado/2007/06/edmx">
   <!-- EF Runtime content -->
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-    <Schema Namespace="roboModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+      <Schema Namespace="roboModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2008" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2006/04/edm/ssdl">
         <EntityType Name="tsiscomexweb_robo">
           <Key>
             <PropertyRef Name="nr_sequencia" />
@@ -15,9 +15,9 @@
           <Property Name="nr_seq" Type="int" />
           <Property Name="tp_consulta" Type="varchar" MaxLength="2" Nullable="false" />
           <Property Name="tp_acao" Type="varchar" MaxLength="15" Nullable="false" />
-          <Property Name="dt_agendamento" Type="datetime" />
-          <Property Name="dt_realizacao" Type="datetime" Nullable="false" />
-          <Property Name="dt_registro_di" Type="datetime" />
+          <Property Name="dt_agendamento" Type="datetime2" Precision="7" />
+          <Property Name="dt_realizacao" Type="datetime2" Precision="7" />
+          <Property Name="dt_registro_di" Type="datetime2" Precision="7" />
           <Property Name="nr_tentativas" Type="int" Nullable="false" />
           <Property Name="tx_erro" Type="text" />
           <Property Name="cd_usuario" Type="int" />
@@ -34,10 +34,11 @@
         <EntityContainer Name="roboModelStoreContainer">
           <EntitySet Name="tsiscomexweb_robo" EntityType="Self.tsiscomexweb_robo" Schema="dbo" store:Type="Tables" />
         </EntityContainer>
-      </Schema></edmx:StorageModels>
+      </Schema>
+    </edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
-      <Schema Namespace="roboModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+      <Schema Namespace="roboModel" Alias="Self" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2006/04/edm">
         <EntityType Name="tsiscomexweb_robo">
           <Key>
             <PropertyRef Name="nr_sequencia" />
@@ -48,9 +49,9 @@
           <Property Name="nr_seq" Type="Int32" />
           <Property Name="tp_consulta" Type="String" MaxLength="2" FixedLength="false" Unicode="false" Nullable="false" />
           <Property Name="tp_acao" Type="String" MaxLength="15" FixedLength="false" Unicode="false" Nullable="false" />
-          <Property Name="dt_agendamento" Type="DateTime" Precision="3" />
-          <Property Name="dt_realizacao" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="dt_registro_di" Type="DateTime" Precision="3" />
+          <Property Name="dt_agendamento" Type="DateTime" Precision="7" />
+          <Property Name="dt_realizacao" Type="DateTime" Precision="7" />
+          <Property Name="dt_registro_di" Type="DateTime" Precision="7" />
           <Property Name="nr_tentativas" Type="Int32" Nullable="false" />
           <Property Name="tx_erro" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
           <Property Name="cd_usuario" Type="Int32" />
@@ -64,20 +65,18 @@
           <Property Name="pdf_extrato" Type="Binary" MaxLength="Max" FixedLength="false" />
           <Property Name="pdf_comprovante" Type="Binary" MaxLength="Max" FixedLength="false" />
         </EntityType>
-        <EntityContainer Name="roboEntities" annotation:LazyLoadingEnabled="true">
+        <EntityContainer Name="roboEntities">
           <EntitySet Name="tsiscomexweb_robo" EntityType="Self.tsiscomexweb_robo" />
         </EntityContainer>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
     <edmx:Mappings>
-      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+      <Mapping Space="C-S" xmlns="urn:schemas-microsoft-com:windows:storage:mapping:CS">
         <EntityContainerMapping StorageEntityContainer="roboModelStoreContainer" CdmEntityContainer="roboEntities">
           <EntitySetMapping Name="tsiscomexweb_robo">
             <EntityTypeMapping TypeName="roboModel.tsiscomexweb_robo">
               <MappingFragment StoreEntitySet="tsiscomexweb_robo">
-                <ScalarProperty Name="pdf_comprovante" ColumnName="pdf_comprovante" />
-                <ScalarProperty Name="pdf_extrato" ColumnName="pdf_extrato" />
                 <ScalarProperty Name="nr_sequencia" ColumnName="nr_sequencia" />
                 <ScalarProperty Name="nr_processo" ColumnName="nr_processo" />
                 <ScalarProperty Name="nr_registro_di" ColumnName="nr_registro_di" />
@@ -97,6 +96,8 @@
                 <ScalarProperty Name="in_situacao" ColumnName="in_situacao" />
                 <ScalarProperty Name="xml_comando" ColumnName="xml_comando" />
                 <ScalarProperty Name="xml_retorno" ColumnName="xml_retorno" />
+                <ScalarProperty Name="pdf_extrato" ColumnName="pdf_extrato" />
+                <ScalarProperty Name="pdf_comprovante" ColumnName="pdf_comprovante" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
@@ -105,7 +106,7 @@
     </edmx:Mappings>
   </edmx:Runtime>
   <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
-  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <Designer xmlns="http://schemas.microsoft.com/ado/2007/06/edmx">
     <Connection>
       <DesignerInfoPropertySet>
         <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
@@ -116,7 +117,7 @@
         <DesignerProperty Name="ValidateOnBuild" Value="true" />
         <DesignerProperty Name="EnablePluralization" Value="false" />
         <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
-        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="UseLegacyProvider" Value="true" />
         <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
       </DesignerInfoPropertySet>
     </Options>

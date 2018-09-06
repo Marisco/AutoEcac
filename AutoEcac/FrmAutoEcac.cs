@@ -326,7 +326,7 @@ namespace AutoEcac
                                 //teste.ChooseCertificate(certificate.Subject, "Selecione um Certificado");
                             }
 
-                            //_extratoService.NavegarURLExtratoDeclaracaoDI();
+                            _extratoService.NavegarURLExtratoDeclaracaoDI();
 
                             
 

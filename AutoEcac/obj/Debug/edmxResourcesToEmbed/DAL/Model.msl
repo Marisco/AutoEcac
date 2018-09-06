@@ -1,11 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+<Mapping Space="C-S" xmlns="urn:schemas-microsoft-com:windows:storage:mapping:CS">
   <EntityContainerMapping StorageEntityContainer="roboModelStoreContainer" CdmEntityContainer="roboEntities">
     <EntitySetMapping Name="tsiscomexweb_robo">
       <EntityTypeMapping TypeName="roboModel.tsiscomexweb_robo">
         <MappingFragment StoreEntitySet="tsiscomexweb_robo">
-          <ScalarProperty Name="pdf_comprovante" ColumnName="pdf_comprovante" />
-          <ScalarProperty Name="pdf_extrato" ColumnName="pdf_extrato" />
           <ScalarProperty Name="nr_sequencia" ColumnName="nr_sequencia" />
           <ScalarProperty Name="nr_processo" ColumnName="nr_processo" />
           <ScalarProperty Name="nr_registro_di" ColumnName="nr_registro_di" />
@@ -25,6 +23,8 @@
           <ScalarProperty Name="in_situacao" ColumnName="in_situacao" />
           <ScalarProperty Name="xml_comando" ColumnName="xml_comando" />
           <ScalarProperty Name="xml_retorno" ColumnName="xml_retorno" />
+          <ScalarProperty Name="pdf_extrato" ColumnName="pdf_extrato" />
+          <ScalarProperty Name="pdf_comprovante" ColumnName="pdf_comprovante" />
         </MappingFragment>
       </EntityTypeMapping>
     </EntitySetMapping>

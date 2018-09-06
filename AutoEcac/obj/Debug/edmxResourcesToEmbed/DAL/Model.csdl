@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Schema Namespace="roboModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+<Schema Namespace="roboModel" Alias="Self" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2006/04/edm">
   <EntityType Name="tsiscomexweb_robo">
     <Key>
       <PropertyRef Name="nr_sequencia" />
@@ -10,9 +10,9 @@
     <Property Name="nr_seq" Type="Int32" />
     <Property Name="tp_consulta" Type="String" MaxLength="2" FixedLength="false" Unicode="false" Nullable="false" />
     <Property Name="tp_acao" Type="String" MaxLength="15" FixedLength="false" Unicode="false" Nullable="false" />
-    <Property Name="dt_agendamento" Type="DateTime" Precision="3" />
-    <Property Name="dt_realizacao" Type="DateTime" Nullable="false" Precision="3" />
-    <Property Name="dt_registro_di" Type="DateTime" Precision="3" />
+    <Property Name="dt_agendamento" Type="DateTime" Precision="7" />
+    <Property Name="dt_realizacao" Type="DateTime" Precision="7" />
+    <Property Name="dt_registro_di" Type="DateTime" Precision="7" />
     <Property Name="nr_tentativas" Type="Int32" Nullable="false" />
     <Property Name="tx_erro" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
     <Property Name="cd_usuario" Type="Int32" />
@@ -26,7 +26,7 @@
     <Property Name="pdf_extrato" Type="Binary" MaxLength="Max" FixedLength="false" />
     <Property Name="pdf_comprovante" Type="Binary" MaxLength="Max" FixedLength="false" />
   </EntityType>
-  <EntityContainer Name="roboEntities" annotation:LazyLoadingEnabled="true">
+  <EntityContainer Name="roboEntities">
     <EntitySet Name="tsiscomexweb_robo" EntityType="Self.tsiscomexweb_robo" />
   </EntityContainer>
 </Schema>
