@@ -18,6 +18,10 @@ using System.Diagnostics;
 using System.Collections.ObjectModel;
 using System.Net;
 using System.Net.Http;
+using System.Xml;
+using System.Xml.Linq;
+using System.Text;
+using System.IO;
 
 namespace AutoEcac
 {
@@ -186,7 +190,6 @@ namespace AutoEcac
 
         private void Form1_Load(object sender, EventArgs e)
         {
-
             Browser = ConfigurarBrowser();
             cbxServico.SelectedIndex = 0;
             cbxperiodo.SelectedIndex = 0;
@@ -268,13 +271,13 @@ namespace AutoEcac
                                 {
                                     if (row.tp_acao == "consulta" || (row.tp_acao == "acompanha" && row.dt_agendamento <= DateTime.Now))
                                     {
-                                        vListaNrConsulta.Add(row.nr_registro_di.ToString().Trim()+"; "+ row.cpf_certificado.ToString().Trim());
+                                        vListaNrConsulta.Add(row.nr_registro_di.ToString().Trim() + "; " + row.cpf_certificado.ToString().Trim());
 
                                         if (!vListaCpf.Contains(row.cpf_certificado.ToString().Trim()))
                                         {
                                             vListaCpf.Add(row.cpf_certificado.ToString().Trim());
                                         }
-                                        
+
                                     }
                                 }
 
@@ -305,45 +308,24 @@ namespace AutoEcac
                         foreach (string cpf in vListaCpf)
                         {
                             FinalizarOperacao();
-
                             X509Certificate2 certificate = store.Certificates.OfType<X509Certificate2>().FirstOrDefault(x => x.Subject.Contains(cpf));
-
                             CertificateDialogHandler teste = new CertificateDialogHandler();
-
                             Browser = ConfigurarBrowser();
-                           
 
-                            IniciarOperacao();                            
-                            try
-                            {
-                                
-                                _extratoService.AbrirBrowser();
-                                //Browser.SwitchTo().Alert().SendKeys(certificate.Subject);
-                                //teste.ChooseCertificate(certificate.Subject, "Siscomex Importação Web - Google Chrome");
-                            }
-                            catch (Exception)
-                            {
-                                //teste.ChooseCertificate(certificate.Subject, "Selecione um Certificado");
-                            }
-
+                            IniciarOperacao();
+                            _extratoService.AbrirBrowser();
                             _extratoService.NavegarURLExtratoDeclaracaoDI();
+                            Thread.Sleep(2000);
 
-                            
-
-                            Thread.Sleep(2000);  
-                            
                             foreach (string di in vListaNrConsulta)
-                            {                                
-
-                                //var di = nrDi.ToString().Split(';')[0];
-                                if (cpf == di.ToString().Split(';')[1].Trim()) {
+                            {
+                                if (cpf == di.ToString().Split(';')[1].Trim())
+                                {
                                     vListaDi.Add(di.ToString().Split(';')[0]);
-                                }                                 
-                            }                           
-
+                                }
+                            }
 
                             _extratoService.ConsultarDI(PeriodoSelecionado, TipoConsultaExtratoSelecionado, vListaDi, dtpInicial.Value, dtpFinal.Value);
-                          
 
                         }
 
@@ -353,12 +335,28 @@ namespace AutoEcac
 
                     if (TipoExtratoSelecionado == TipoExtrato.LI)
                     {
-                        _extratoService.NavegarURLExtratoDeclaracaoLI();
-
-                        Thread.Sleep(2000);
 
                         if (TipoConsultaExtratoSelecionado == TipoConsultaExtrato.NumeroDeclaracao)
                         {
+                            if (cbxBancoDados.Checked)
+                            {
+
+                                foreach (var row in db.tsiscomexweb_robo.Where(reg => reg.tp_consulta == "LI" && reg.in_rodando == 1 && reg.in_desembaraco == 0))
+                                {
+                                    if (row.tp_acao == "consulta" || (row.tp_acao == "acompanha" && row.dt_agendamento <= DateTime.Now))
+                                    {
+                                        vListaNrConsulta.Add(row.nr_registro_di.ToString().Trim() + "; " + row.cpf_certificado.ToString().Trim());
+
+                                        if (!vListaCpf.Contains(row.cpf_certificado.ToString().Trim()))
+                                        {
+                                            vListaCpf.Add(row.cpf_certificado.ToString().Trim());
+                                        }
+
+                                    }
+                                }
+
+                            }
+
                             if (!string.IsNullOrEmpty(edtNrConsultaDI.Text.Trim()))
                             {
                                 vListaNrConsulta.Add(edtNrConsultaDI.Text.Trim());
@@ -377,7 +375,36 @@ namespace AutoEcac
                             vListaNrConsulta.Add(edtNrConsultaDI.Text.Trim());
                         }
 
-                        _extratoService.ConsultarLI(PeriodoSelecionado, TipoConsultaExtratoSelecionado, vListaNrConsulta, dtpInicial.Value, dtpFinal.Value);
+
+                        var store = new X509Store(StoreLocation.CurrentUser);
+                        store.Open(OpenFlags.ReadOnly);
+                        var certificates = store.Certificates;
+                        foreach (string cpf in vListaCpf)
+                        {
+                            FinalizarOperacao();
+
+                            X509Certificate2 certificate = store.Certificates.OfType<X509Certificate2>().FirstOrDefault(x => x.Subject.Contains(cpf));
+
+                            CertificateDialogHandler teste = new CertificateDialogHandler();
+
+                            Browser = ConfigurarBrowser();
+
+
+                            IniciarOperacao();
+                            _extratoService.AbrirBrowser();
+                            _extratoService.NavegarURLExtratoDeclaracaoLI();
+                            Thread.Sleep(2000);
+                            foreach (string di in vListaNrConsulta)
+                            {
+                                if (cpf == di.ToString().Split(';')[1].Trim())
+                                {
+                                    vListaDi.Add(di.ToString().Split(';')[0]);
+                                }
+                            }
+
+                            _extratoService.ConsultarLI(PeriodoSelecionado, TipoConsultaExtratoSelecionado, vListaDi, dtpInicial.Value, dtpFinal.Value);
+                        }
+
                     }
                 }
 
@@ -408,7 +435,7 @@ namespace AutoEcac
             }
         }
 
-        
+
 
         private void btnAdicionar_Click(object sender, EventArgs e)
         {
@@ -552,7 +579,7 @@ namespace AutoEcac
         {
             if (cbxBancoDados.Enabled)
             {
-                rbConsultaDI.Checked = true;
+                //rbConsultaDI.Checked = true;
                 rdbNrDeclaracao.Checked = true;
 
                 dgvNrDelacaracao.Enabled = true; // rdbNrDeclaracao.Checked;

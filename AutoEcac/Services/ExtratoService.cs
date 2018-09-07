@@ -7,6 +7,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -50,18 +51,18 @@ namespace AutoEcac.Servicos
                     switch ((int)pTipoConsultaExtrato)
                     {
                         case (int)TipoConsultaExtrato.NumeroDeclaracao:
-                            _browser.FindElement(By.Name("numeroLI")).Clear();
-                            Thread.Sleep(1000);
+                            _browser.FindElement(By.Name("numeroLI")).SendKeys(Keys.Delete);
+                            Thread.Sleep(500);
                             _browser.FindElement(By.Name("numeroLI")).SendKeys(numero);
                             break;
                         case (int)TipoConsultaExtrato.CnpjImportador:
-                            _browser.FindElement(By.Name("cnpjImportador")).Clear();
-                            _browser.FindElement(By.Name("cnpjImportador")).Click();
+                            _browser.FindElement(By.Name("numeroLI")).SendKeys(Keys.Delete);
+                            Thread.Sleep(500);
                             _browser.FindElement(By.Name("cnpjImportador")).SendKeys(numero);
                             break;
                         case (int)TipoConsultaExtrato.CpfImportador:
-                            _browser.FindElement(By.Name("cpfImportador")).Clear();
-                            _browser.FindElement(By.Name("cpfImportador")).Click();
+                            _browser.FindElement(By.Name("numeroLI")).SendKeys(Keys.Delete);
+                            Thread.Sleep(500);
                             _browser.FindElement(By.Name("cpfImportador")).SendKeys(numero);
                             break;
                     }
@@ -108,9 +109,53 @@ namespace AutoEcac.Servicos
                         _browser.Navigate().Back();
                         Thread.Sleep(1000);
                         _browser.Navigate().Back();
+                        Thread.Sleep(1000);
+
+                        _browser.Navigate().GoToUrl("https://www1c.siscomex.receita.fazenda.gov.br/li_web-7/liweb_menu_li_consultar_lote_li.do");
+                        Thread.Sleep(2000);
+
+                        XmlDocument consultaPorLi = new XmlDocument();
+                        consultaPorLi.Load(@"C:\AutoEcac\Arquivos\ConlustaLotePadrao\consultaPorLi.xml");
+                        consultaPorLi.FirstChild.Value = "version=\"1.0\" encoding=\"UTF-8\"";
+                        consultaPorLi.GetElementsByTagName("li").Item(0).InnerText = numero;
+                        //consultaPorLi.Save(@"C:\AutoEcac\Arquivos\ConlustaLotePadrao\consultaPorLi.xml");
+
+                        string fileName = "C:\\AutoEcac\\Arquivos\\ConlustaLotePadrao\\consultaPorLi.xml";
+                        string textToAdd = consultaPorLi.InnerXml;
+                        FileStream fs = null;
+                        try
+                        {
+                            fs = new FileStream(fileName, FileMode.Truncate);
+                            using (StreamWriter writer = new StreamWriter(fs, new UTF8Encoding(false)))
+                            {                                
+                                writer.Write(textToAdd);
+                            }
+                        }
+                        finally
+                        {
+                            if (fs != null)
+                                fs.Dispose();
+                        }
+
+                        _browser.FindElement(By.Id("arquivo")).Click();
+                        Thread.Sleep(2000);
+                        System.Windows.Forms.SendKeys.SendWait(@"C:\AutoEcac\Arquivos\ConlustaLotePadrao\consultaPorLi.xml");
+                        Thread.Sleep(2000);
+                        System.Windows.Forms.SendKeys.SendWait(@"{Enter}");
+
+                        Thread.Sleep(1000);
+                        _browser.FindElement(By.Id("enviarArquivo")).Click();
+                        Thread.Sleep(2000);
+                        _NmArquivoPadrao = "CONSULTA.XXXXXX.xml";
+                        _NmArquivoNovo = numero + "_consulta.xml";
+                        SalvarArquivosBaixados(_NmArquivoNovo, this.DiretorioCompleto);
+                        Thread.Sleep(1000);
+                        _browser.Navigate().Back();
+                        Thread.Sleep(1000);
+
 
                     }
-                    catch (Exception)
+                    catch (Exception e)
                     {
                         Thread.Sleep(1000);
                         try
@@ -129,6 +174,7 @@ namespace AutoEcac.Servicos
             }
             pNrConsulta.Clear();
         }
+
 
         private List<string> getListaLI()
         {
@@ -179,7 +225,7 @@ namespace AutoEcac.Servicos
                 }
             }
             return vListaLi;
-        }
+        }        
 
         public void ConsultarDI(Periodo pPeriodo, TipoConsultaExtrato pTipoConsultaExtrato, List<string> pNrConsulta, DateTime pDtInicial, DateTime pDtFinal)
         {
