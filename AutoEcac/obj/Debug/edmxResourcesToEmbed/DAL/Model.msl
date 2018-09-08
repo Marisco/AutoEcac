@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Mapping Space="C-S" xmlns="urn:schemas-microsoft-com:windows:storage:mapping:CS">
+<Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
   <EntityContainerMapping StorageEntityContainer="roboModelStoreContainer" CdmEntityContainer="roboEntities">
     <EntitySetMapping Name="tsiscomexweb_robo">
       <EntityTypeMapping TypeName="roboModel.tsiscomexweb_robo">

@@ -189,7 +189,8 @@ namespace AutoEcac
         }
 
         private void Form1_Load(object sender, EventArgs e)
-        {
+        {          
+
             Browser = ConfigurarBrowser();
             cbxServico.SelectedIndex = 0;
             cbxperiodo.SelectedIndex = 0;
