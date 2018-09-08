@@ -303,14 +303,10 @@ namespace AutoEcac
 
                         }
 
-                        var store = new X509Store(StoreLocation.CurrentUser);
-                        store.Open(OpenFlags.ReadOnly);
-                        var certificates = store.Certificates;
                         foreach (string cpf in vListaCpf)
                         {
-                            FinalizarOperacao();
-                            X509Certificate2 certificate = store.Certificates.OfType<X509Certificate2>().FirstOrDefault(x => x.Subject.Contains(cpf));
-                            CertificateDialogHandler teste = new CertificateDialogHandler();
+                            FinalizarOperacao();                            
+                            
                             Browser = ConfigurarBrowser();
 
                             IniciarOperacao();
@@ -375,22 +371,11 @@ namespace AutoEcac
                         {
                             vListaNrConsulta.Add(edtNrConsultaDI.Text.Trim());
                         }
-
-
-                        var store = new X509Store(StoreLocation.CurrentUser);
-                        store.Open(OpenFlags.ReadOnly);
-                        var certificates = store.Certificates;
+                        
                         foreach (string cpf in vListaCpf)
                         {
                             FinalizarOperacao();
-
-                            X509Certificate2 certificate = store.Certificates.OfType<X509Certificate2>().FirstOrDefault(x => x.Subject.Contains(cpf));
-
-                            CertificateDialogHandler teste = new CertificateDialogHandler();
-
                             Browser = ConfigurarBrowser();
-
-
                             IniciarOperacao();
                             _extratoService.AbrirBrowser();
                             _extratoService.NavegarURLExtratoDeclaracaoLI();

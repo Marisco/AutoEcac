@@ -39,6 +39,25 @@ namespace AutoEcac.Utils
         ANUAL = 6
     }
 
+    public enum InSituacao
+    {
+            TODAS = 0,                                
+			PARA_ANÁLISE = 1,                          
+			EM_ANÁLISE =  2,                           
+			EM_EXIGÊNCIA = 3,                          
+			INDEFERIDA = 4,                            
+			DEFERIDA= 5,                               
+			DEFERIDA_JUDICIALMENTE = 6,                
+			DEFERIDA_VINCULADA_DI = 7,               
+			DEFERIDA_JUDICIALMENTE_VINCULADA_DI = 8, 
+			DEFERIDA_RESERVADA = 9,                    
+			DEFERIDA_JUDICIALMENTE_RESERVADA = 10,     
+			EMBARQUE_AUTORIZADO = 15,                  
+			VENCIDA = 16,                              
+			DESEMBARAÇADA = 17,
+			CANCELADA = 18
+    }
+
     #endregion
 
     public class Helper
@@ -55,24 +74,6 @@ namespace AutoEcac.Utils
 
         }
     }
-
-    public class CustomXmlTextWriter : XmlTextWriter
-    {
-        public CustomXmlTextWriter(string filename)
-            : base(filename, Encoding.UTF8)
-        {
-
-        }
-
-        public override void WriteStartDocument()
-        {
-            
-            WriteRaw("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-        }
-
-        public override void WriteEndDocument()
-        {
-        }
-    }
+    
 }
 

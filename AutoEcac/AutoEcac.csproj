@@ -148,7 +148,6 @@
     <Compile Include="Services\kestraaUpload.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Services\CertificateDialogHandler.cs" />
     <Compile Include="Services\ExtratoService.cs" />
     <Compile Include="Services\DARFService.cs" />
     <Compile Include="Services\BaseService.cs" />
