@@ -42,9 +42,9 @@ namespace AutoEcac.Utils
     public enum InSituacao
     {
             TODAS = 0,                                
-			PARA_ANÁLISE = 1,                          
-			EM_ANÁLISE =  2,                           
-			EM_EXIGÊNCIA = 3,                          
+			PARA_ANALISE = 1,                          
+			EM_ANALISE =  2,                           
+			EM_EXIGENCIA = 3,                          
 			INDEFERIDA = 4,                            
 			DEFERIDA= 5,                               
 			DEFERIDA_JUDICIALMENTE = 6,                

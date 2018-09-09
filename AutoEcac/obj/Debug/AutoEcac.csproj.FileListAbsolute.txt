@@ -99,3 +99,4 @@ C:\_Kestra\AutoEcac\obj\Debug\AutoEcac.csproj.CopyComplete
 C:\_Kestra\AutoEcac\bin\Debug\AutoItX3.dll
 C:\_Kestra\AutoEcac\bin\Debug\AutoItX3_x64.dll
 C:\_Kestra\AutoEcac\bin\Debug\AutoItX3.Assembly.dll
+C:\_Kestra\AutoEcac\bin\Debug\Newtonsoft.Json.dll

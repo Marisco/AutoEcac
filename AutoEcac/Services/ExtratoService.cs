@@ -4,14 +4,13 @@ using AutoEcac.Utils;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Interactions;
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Xml;
+using Newtonsoft.Json;
 
 namespace AutoEcac.Servicos
 {
@@ -36,6 +35,145 @@ namespace AutoEcac.Servicos
         public void NavegarURLExtratoDeclaracaoLI()
         {
             _browser.Navigate().GoToUrl(URL_EXTRATO_DECLARACAO_LI);
+        }
+
+
+        public void AtualizarLI(string pCaminhoComnpleto, ref tsiscomexweb_robo pRegistro)
+        {
+            string orgaoAnuente = "";
+            int codigoSituacaoAnuencia;
+            int inRodando = 0;
+
+            XmlDocument xmlLiCompleta = new XmlDocument();
+            xmlLiCompleta.Load(@pCaminhoComnpleto);
+            XmlNamespaceManager nsMgr = new XmlNamespaceManager(xmlLiCompleta.NameTable);
+            nsMgr.AddNamespace("li", "http://www.serpro.gov.br/liweb/schema/ResultadoConsultaLoteLiWeb.html");
+            XmlNode listaAnuencias = xmlLiCompleta.SelectSingleNode("/li:resposta-consulta-li/li:lista-li-completa/li:li-completa/li:Grupo-LI-Anuencias/li:lista-anuencias", nsMgr);
+            foreach (XmlNode anuencia in listaAnuencias)
+            {
+                foreach (XmlNode atributo in anuencia.ChildNodes)
+                {
+
+
+                    if (atributo.Name == "orgao-anuente")
+                    {
+                        if (string.IsNullOrEmpty(orgaoAnuente))
+                        {
+
+                            orgaoAnuente = "{ orgaoAnuente : { " + atributo.InnerXml + ": ";
+                        }
+                        else
+                        {
+                            orgaoAnuente = orgaoAnuente + ", { " + atributo.InnerXml + ": ";
+                        }
+                    };
+
+                    if (atributo.Name == "codigo-situacao-anuencia")
+                    {
+
+                        codigoSituacaoAnuencia = int.Parse(atributo.InnerXml);
+                        switch (codigoSituacaoAnuencia)
+                        {
+                            case (int)InSituacao.CANCELADA:
+                                orgaoAnuente = orgaoAnuente + "CANCELADA },";
+                                break;
+                            case (int)InSituacao.DEFERIDA:
+                                orgaoAnuente = orgaoAnuente + "DEFERIDA },";
+                                break;
+                            case (int)InSituacao.DEFERIDA_JUDICIALMENTE:
+                                orgaoAnuente = orgaoAnuente + "DEFERIDA_JUDICIALMENTE },";
+                                break;
+                            case (int)InSituacao.DEFERIDA_JUDICIALMENTE_RESERVADA:
+                                orgaoAnuente = orgaoAnuente + "DEFERIDA_JUDICIALMENTE_RESERVADA },";
+                                break;
+                            case (int)InSituacao.DEFERIDA_JUDICIALMENTE_VINCULADA_DI:
+                                orgaoAnuente = orgaoAnuente + "DEFERIDA_JUDICIALMENTE_VINCULADA_DI },";
+                                break;
+                            case (int)InSituacao.DEFERIDA_RESERVADA:
+                                orgaoAnuente = orgaoAnuente + "DEFERIDA_RESERVADA },";
+                                break;
+                            case (int)InSituacao.DEFERIDA_VINCULADA_DI:
+                                orgaoAnuente = orgaoAnuente + "DEFERIDA_VINCULADA_DI },";
+                                break;
+                            case (int)InSituacao.DESEMBARAÇADA:
+                                orgaoAnuente = orgaoAnuente + "DESEMBARAÇADA },";
+                                break;
+                            case (int)InSituacao.VENCIDA:
+                                orgaoAnuente = orgaoAnuente + "VENCIDA },";
+                                break;
+                            case (int)InSituacao.INDEFERIDA:
+                                orgaoAnuente = orgaoAnuente + "INDEFERIDA },";
+                                break;
+                            case (int)InSituacao.EMBARQUE_AUTORIZADO:
+                                orgaoAnuente = orgaoAnuente + "EMBARQUE_AUTORIZADO },";
+                                inRodando++;
+                                break;
+                            case (int)InSituacao.EM_ANALISE:
+                                orgaoAnuente = orgaoAnuente + "EM_ANALISE },";
+                                inRodando++;
+                                break;
+                            case (int)InSituacao.EM_EXIGENCIA:
+                                orgaoAnuente = orgaoAnuente + "EM_EXIGENCIA },";
+                                inRodando++;
+                                break;
+                            case (int)InSituacao.PARA_ANALISE:
+                                orgaoAnuente = orgaoAnuente + "PARA_ANALISE },";
+                                inRodando++;
+                                break;
+                        }
+
+                    };
+
+                }
+
+            };
+
+            orgaoAnuente = orgaoAnuente + "}";
+
+
+            string OrgaoAnuenteBase = pRegistro.tp_anuencia;
+            string OrgaoAnuenteAtual = orgaoAnuente;
+
+            pRegistro.xml_comando = xmlLiCompleta.OuterXml;
+            pRegistro.in_desembaraco = 0;
+            pRegistro.in_rodando = 0;
+
+            if (pRegistro.tp_acao != "acompanha" && OrgaoAnuenteBase != OrgaoAnuenteAtual)
+            {
+                tsiscomexweb_robo novoRegistro = new tsiscomexweb_robo
+                    {
+                        nr_processo = pRegistro.nr_processo,
+                        nr_registro = pRegistro.nr_registro,
+                        nr_seq = pRegistro.nr_seq,
+                        tp_consulta = pRegistro.tp_consulta,
+                        tp_acao = "acompanha",
+                        dt_agendamento = DateTime.Now.AddMinutes(30),
+                        dt_realizacao = DateTime.Now,
+                        dt_registro_di = pRegistro.dt_registro_di,
+                        nr_tentativas = 1,
+                        tx_erro = "",
+                        cd_usuario = pRegistro.cd_usuario,
+                        cpf_certificado = pRegistro.cpf_certificado,
+                        in_rodando = 1,
+                        in_desembaraco = 0,
+                        tp_anuencia = orgaoAnuente,
+                        in_situacao = 0,
+                        xml_comando = xmlLiCompleta.OuterXml,
+                        xml_retorno = "",
+                        pdf_comprovante = null,
+                        pdf_extrato = null
+                        
+                };                
+                _db.tsiscomexweb_robo.Add(novoRegistro);                
+            }
+            else
+            {
+                pRegistro.dt_realizacao  = DateTime.Now;
+                pRegistro.dt_agendamento = DateTime.Now.AddMinutes(30);
+                pRegistro.nr_tentativas  = pRegistro.nr_tentativas++;
+            }
+
+
         }
 
         public void ConsultarLI(Periodo pPeriodo, TipoConsultaExtrato pTipoConsultaExtrato, List<string> pNrConsulta, DateTime pDtInicial, DateTime pDtFinal)
@@ -99,12 +237,19 @@ namespace AutoEcac.Servicos
 
                     try
                     {
+                        int numeroLi = int.Parse(numero);
+                        tsiscomexweb_robo registro = _db.tsiscomexweb_robo.Where(reg => reg.nr_registro == numeroLi).First();
+                        Thread.Sleep(2000);
+
                         _browser.FindElement(By.Id("imprimir")).Click();
                         Thread.Sleep(2000);
                         _NmArquivoPadrao = "ExtratoLI.pdf";
                         _NmArquivoNovo = numero + "_extrato.pdf";
                         SalvarArquivosBaixados(_NmArquivoNovo, this.DiretorioCompleto);
                         Thread.Sleep(1000);
+
+                        var arquivoPdf = System.IO.File.ReadAllBytes(this.DiretorioCompleto + "\\" + _NmArquivoNovo);
+                        registro.pdf_extrato = arquivoPdf;
 
                         _browser.Navigate().Back();
                         Thread.Sleep(1000);
@@ -127,7 +272,7 @@ namespace AutoEcac.Servicos
                         {
                             fs = new FileStream(fileName, FileMode.Truncate);
                             using (StreamWriter writer = new StreamWriter(fs, new UTF8Encoding(false)))
-                            {                                
+                            {
                                 writer.Write(textToAdd);
                             }
                         }
@@ -153,6 +298,9 @@ namespace AutoEcac.Servicos
                         _browser.Navigate().Back();
                         Thread.Sleep(1000);
 
+                        AtualizarLI(this.DiretorioCompleto + "\\" + _NmArquivoNovo, ref registro);
+
+                        _db.SaveChanges();
 
                     }
                     catch (Exception)
@@ -225,7 +373,7 @@ namespace AutoEcac.Servicos
                 }
             }
             return vListaLi;
-        }        
+        }
 
         public void ConsultarDI(Periodo pPeriodo, TipoConsultaExtrato pTipoConsultaExtrato, List<string> pNrConsulta, DateTime pDtInicial, DateTime pDtFinal)
         {
