@@ -81,9 +81,11 @@ namespace AutoEcac
 
             if (TipoServicoSelecionado == TipoServico.DARF)
             {
-                _darfService = new DARFService(Browser);
-                _darfService._tipoServicoSelecionado = TipoServico.DARF;
-                _darfService._CNPJ = edtCNPJ.Text.Trim();
+                _darfService = new DARFService(Browser)
+                {
+                    _tipoServicoSelecionado = TipoServico.DARF,
+                    _CNPJ = edtCNPJ.Text.Trim()
+                };
 
                 _darfService.AbrirBrowser();
 
@@ -91,10 +93,12 @@ namespace AutoEcac
             else if (TipoServicoSelecionado == TipoServico.EXTRATO)
             {
                 db = new roboEntities();
-                _extratoService = new ExtratoService(Browser, db);
-                _extratoService._tipoServicoSelecionado = TipoServico.EXTRATO;
-                _extratoService._tipoExtratoSelecionado = TipoExtratoSelecionado;
-                _extratoService._CNPJ = edtCNPJ.Text.Trim();
+                _extratoService = new ExtratoService(Browser, db)
+                {
+                    _tipoServicoSelecionado = TipoServico.EXTRATO,
+                    _tipoExtratoSelecionado = TipoExtratoSelecionado,
+                    _CNPJ = edtCNPJ.Text.Trim()
+                };
                 //_extratoService.AbrirBrowser();
             }
             else
@@ -272,7 +276,7 @@ namespace AutoEcac
                                 {
                                     if (row.tp_acao == "consulta" || (row.tp_acao == "acompanha" && row.dt_agendamento <= DateTime.Now))
                                     {
-                                        vListaNrConsulta.Add(row.nr_registro_di.ToString().Trim() + "; " + row.cpf_certificado.ToString().Trim());
+                                        vListaNrConsulta.Add(row.nr_registro.ToString().Trim() + "; " + row.cpf_certificado.ToString().Trim());
 
                                         if (!vListaCpf.Contains(row.cpf_certificado.ToString().Trim()))
                                         {
@@ -342,7 +346,7 @@ namespace AutoEcac
                                 {
                                     if (row.tp_acao == "consulta" || (row.tp_acao == "acompanha" && row.dt_agendamento <= DateTime.Now))
                                     {
-                                        vListaNrConsulta.Add(row.nr_registro_di.ToString().Trim() + "; " + row.cpf_certificado.ToString().Trim());
+                                        vListaNrConsulta.Add(row.nr_registro.ToString().Trim() + "; " + row.cpf_certificado.ToString().Trim());
 
                                         if (!vListaCpf.Contains(row.cpf_certificado.ToString().Trim()))
                                         {

@@ -6,7 +6,7 @@
         <MappingFragment StoreEntitySet="tsiscomexweb_robo">
           <ScalarProperty Name="nr_sequencia" ColumnName="nr_sequencia" />
           <ScalarProperty Name="nr_processo" ColumnName="nr_processo" />
-          <ScalarProperty Name="nr_registro_di" ColumnName="nr_registro_di" />
+          <ScalarProperty Name="nr_registro" ColumnName="nr_registro" />
           <ScalarProperty Name="nr_seq" ColumnName="nr_seq" />
           <ScalarProperty Name="tp_consulta" ColumnName="tp_consulta" />
           <ScalarProperty Name="tp_acao" ColumnName="tp_acao" />

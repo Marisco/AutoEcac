@@ -1,17 +1,18 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Schema Namespace="roboModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2008" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+<Schema Namespace="roboModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
   <EntityType Name="tsiscomexweb_robo">
     <Key>
       <PropertyRef Name="nr_sequencia" />
     </Key>
     <Property Name="nr_sequencia" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-    <Property Name="nr_registro_di" Type="int" />
+    <Property Name="nr_processo" Type="varchar" MaxLength="50" />
+    <Property Name="nr_registro" Type="int" />
     <Property Name="nr_seq" Type="int" />
     <Property Name="tp_consulta" Type="varchar" MaxLength="2" Nullable="false" />
     <Property Name="tp_acao" Type="varchar" MaxLength="15" Nullable="false" />
-    <Property Name="dt_agendamento" Type="datetime2" Precision="7" />
-    <Property Name="dt_realizacao" Type="datetime2" Precision="7" />
-    <Property Name="dt_registro_di" Type="datetime2" Precision="7" />
+    <Property Name="dt_agendamento" Type="datetime" />
+    <Property Name="dt_realizacao" Type="datetime" Nullable="false" />
+    <Property Name="dt_registro_di" Type="datetime" />
     <Property Name="nr_tentativas" Type="int" Nullable="false" />
     <Property Name="tx_erro" Type="text" />
     <Property Name="cd_usuario" Type="int" />
@@ -24,7 +25,6 @@
     <Property Name="xml_retorno" Type="text" />
     <Property Name="pdf_extrato" Type="varbinary(max)" />
     <Property Name="pdf_comprovante" Type="varbinary(max)" />
-    <Property Name="nr_processo" Type="int" />
   </EntityType>
   <EntityContainer Name="roboModelStoreContainer">
     <EntitySet Name="tsiscomexweb_robo" EntityType="Self.tsiscomexweb_robo" Schema="dbo" store:Type="Tables" />

@@ -155,7 +155,7 @@ namespace AutoEcac.Servicos
 
 
                     }
-                    catch (Exception e)
+                    catch (Exception)
                     {
                         Thread.Sleep(1000);
                         try
@@ -280,7 +280,7 @@ namespace AutoEcac.Servicos
                         ConsultarDI(pPeriodo, 0, vListaDI, DateTime.Now, DateTime.Now);
                     }
                     int nrRegistroDi = Int32.Parse(numero);
-                    tsiscomexweb_robo registro = _db.tsiscomexweb_robo.OrderByDescending(reg => reg.nr_sequencia).Where(reg => reg.nr_registro_di == nrRegistroDi).First();
+                    tsiscomexweb_robo registro = _db.tsiscomexweb_robo.OrderByDescending(reg => reg.nr_sequencia).Where(reg => reg.nr_registro == nrRegistroDi).First();
 
 
                     try
@@ -329,7 +329,7 @@ namespace AutoEcac.Servicos
                         _browser.Navigate().Back();
 
                     }
-                    catch (Exception e)
+                    catch (Exception)
                     {
                         Thread.Sleep(1000);
                         try
@@ -460,27 +460,29 @@ namespace AutoEcac.Servicos
 
                 if (pRegistro.tp_acao != "acompanha")
                 {
-                    tsiscomexweb_robo novoRegistro = new tsiscomexweb_robo();
-                    novoRegistro.nr_processo = pRegistro.nr_processo;
-                    novoRegistro.nr_registro_di = pRegistro.nr_registro_di;
-                    novoRegistro.nr_seq = pRegistro.nr_seq;
-                    novoRegistro.tp_consulta = pRegistro.tp_consulta;
-                    novoRegistro.tp_acao = "acompanha";
-                    novoRegistro.dt_agendamento = DateTime.Now.AddMinutes(30);
-                    novoRegistro.dt_realizacao = DateTime.Now;
-                    novoRegistro.dt_registro_di = pRegistro.dt_registro_di;
-                    novoRegistro.nr_tentativas = 1;
-                    novoRegistro.tx_erro = "";
-                    novoRegistro.cd_usuario = pRegistro.cd_usuario;
-                    novoRegistro.cpf_certificado = pRegistro.cpf_certificado;
-                    novoRegistro.in_rodando = 1;
-                    novoRegistro.in_desembaraco = 0;
-                    novoRegistro.tp_anuencia = pRegistro.tp_anuencia;
-                    novoRegistro.in_situacao = 0;
-                    novoRegistro.xml_comando = "";
-                    novoRegistro.xml_retorno = "";
-                    novoRegistro.pdf_comprovante = null;
-                    novoRegistro.pdf_extrato = null;
+                    tsiscomexweb_robo novoRegistro = new tsiscomexweb_robo
+                    {
+                        nr_processo = pRegistro.nr_processo,
+                        nr_registro = pRegistro.nr_registro,
+                        nr_seq = pRegistro.nr_seq,
+                        tp_consulta = pRegistro.tp_consulta,
+                        tp_acao = "acompanha",
+                        dt_agendamento = DateTime.Now.AddMinutes(30),
+                        dt_realizacao = DateTime.Now,
+                        dt_registro_di = pRegistro.dt_registro_di,
+                        nr_tentativas = 1,
+                        tx_erro = "",
+                        cd_usuario = pRegistro.cd_usuario,
+                        cpf_certificado = pRegistro.cpf_certificado,
+                        in_rodando = 1,
+                        in_desembaraco = 0,
+                        tp_anuencia = pRegistro.tp_anuencia,
+                        in_situacao = 0,
+                        xml_comando = "",
+                        xml_retorno = "",
+                        pdf_comprovante = null,
+                        pdf_extrato = null
+                    };
                     _db.tsiscomexweb_robo.Add(novoRegistro);
 
                 }
