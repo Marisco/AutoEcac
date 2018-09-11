@@ -11,6 +11,7 @@ using System.Text;
 using System.Threading;
 using System.Xml;
 using Newtonsoft.Json;
+using AutoEcac.model;
 
 namespace AutoEcac.Servicos
 {
@@ -19,12 +20,13 @@ namespace AutoEcac.Servicos
         private string _NmArquivoNovo;
         private IWebDriver _browser;
         private roboEntities _db;
+		private KestraaUpload _kestraaUpload;
 
         public ExtratoService(IWebDriver browser, roboEntities db)
         {
             _browser = browser;
             _db = db;
-
+			_kestraaUpload = new KestraaUpload();
         }
 
         public void NavegarURLExtratoDeclaracaoDI()
@@ -441,7 +443,16 @@ namespace AutoEcac.Servicos
                         Thread.Sleep(2000);
 
                         var arquivo = System.IO.File.ReadAllText(this.DiretorioCompleto + "\\" + _NmArquivoNovo);
-                        registro.xml_retorno = arquivo;
+						
+						registro.xml_retorno = arquivo;
+
+						var arquivoXml = System.IO.File.ReadAllBytes(this.DiretorioCompleto + "\\" + _NmArquivoNovo);
+						KestraaUploadRequest uploadRequest = new KestraaUploadRequest(arquivoXml, "xml", 
+							"NUMERODI - XML Acompanhamento", 
+							DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss"),
+							"99999999");
+
+						_kestraaUpload.enviarArquivosws(uploadRequest,registro.nr_processo);
 
                         _browser.FindElement(By.Id("btnRegistrarDI")).Click();
                         Thread.Sleep(2000);
@@ -453,7 +464,14 @@ namespace AutoEcac.Servicos
                         var arquivoPdf = System.IO.File.ReadAllBytes(this.DiretorioCompleto + "\\" + _NmArquivoNovo);
                         registro.pdf_extrato = arquivoPdf;
 
-                        if (gerarXmlAcompanhamento(numero, ref registro))
+						uploadRequest = new KestraaUploadRequest(arquivoPdf, "xml",
+							"NUMERODI - Extrato DI",
+							DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss"),
+							"99999999");
+
+						_kestraaUpload.enviarArquivosws(uploadRequest, registro.nr_processo);
+
+						if (gerarXmlAcompanhamento(numero, ref registro))
                         {
                             _browser.FindElement(By.Id("btnComprovanteDI")).Click();
                             Thread.Sleep(1000);
@@ -468,7 +486,14 @@ namespace AutoEcac.Servicos
                             arquivoPdf = System.IO.File.ReadAllBytes(this.DiretorioCompleto + "\\" + _NmArquivoNovo);
                             registro.pdf_comprovante = arquivoPdf;
 
-                            _browser.Close();
+							uploadRequest = new KestraaUploadRequest(arquivoPdf, "xml",
+								"NUMERODI - Comprovante",
+								DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss"),
+								"99999999");
+
+							_kestraaUpload.enviarArquivosws(uploadRequest, registro.nr_processo);
+
+							_browser.Close();
                             _browser.SwitchTo().Window(_browser.WindowHandles.First());
 
                         }
@@ -606,7 +631,15 @@ namespace AutoEcac.Servicos
                 pRegistro.in_desembaraco = 0;
                 pRegistro.in_rodando = 0;
 
-                if (pRegistro.tp_acao != "acompanha")
+				var arquivoXml = System.IO.File.ReadAllBytes(this.DiretorioCompleto + "\\" + pNumerorDi + "_situacao.xml");
+				KestraaUploadRequest uploadRequest = new KestraaUploadRequest(arquivoXml, "xml",
+							"NUMERODI - XML Acompanhamento",
+							DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss"),
+							"99999999");
+
+				_kestraaUpload.enviarArquivosws(uploadRequest, pRegistro.nr_processo);
+
+				if (pRegistro.tp_acao != "acompanha")
                 {
                     tsiscomexweb_robo novoRegistro = new tsiscomexweb_robo
                     {
@@ -648,7 +681,15 @@ namespace AutoEcac.Servicos
                 pRegistro.dt_realizacao = DateTime.Now;
                 pRegistro.in_desembaraco = 1;
                 pRegistro.in_rodando = 0;
-            }
+
+				var arquivoXml = System.IO.File.ReadAllBytes(this.DiretorioCompleto + "\\" + pNumerorDi + "_situacao.xml");
+				KestraaUploadRequest uploadRequest = new KestraaUploadRequest(arquivoXml, "xml",
+							"NUMERODI - XML Comando",
+							DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss"),
+							"99999999");
+
+				_kestraaUpload.enviarArquivosws(uploadRequest, pRegistro.nr_processo);
+			}
 
             _browser.Close();
             _browser.SwitchTo().Window(_browser.WindowHandles.First());

@@ -1,14 +1,22 @@
-﻿using System;
+﻿using AutoEcac.model;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web.Script.Serialization;
 
 namespace AutoEcac
 {
-    public class kestraaUpload
+    public class KestraaUpload
     {
+
+		private static readonly HttpClient client = new HttpClient();
+		private string urlBase = "https://kestraa-upload-qa.azurewebsites.net/upload/Shipments/";
+
 		// instanciar a classe para chamar o servico
 		//kestraaUpload enviarAquivo = new kestraaUpload();
 		//envio.enviarArquivosws();
@@ -22,7 +30,7 @@ namespace AutoEcac
 		//Authorization:KestraaUploadServiceApiKey eyJhbGciOiJIUzI1NiJ9.S2VzdHJhYVVwbG9hZFNlcnZpY2VBcGlLZXk.ybCz7EEcTl8Hjf9lx3zjQdbd1qPcJGn_LBR3z0OGyGI
 		//Content-Type:application/json
 
-		//body:
+		//body:{header:{}, body:{fileToUpload:132, }}
 		//fileToUpload: arquivo que será enviado
 
 		//fileType:Import Declaration - DI, Receipt of Import - CI
@@ -31,16 +39,18 @@ namespace AutoEcac
 		//userId:99999999
 
 
-		public void enviarArquivosws()
+		public void enviarArquivosws(KestraaUploadRequest requestData, String nrProcesso)
         {
-            HttpWebRequest webrequest = (HttpWebRequest)WebRequest.Create("https://kestraa-upload-qa.azurewebsites.net/upload/Shipments");
-            webrequest.ContentType = "application/json";
-            webrequest.Method = "POST";
-            webrequest.Headers.Add("Authorization", "eyJhbGciOiJIUzI1NiJ9.S2VzdHJhYVVwbG9hZFNlcnZpY2VBcGlLZXk.ybCz7EEcTl8Hjf9lx3zjQdbd1qPcJGn_LBR3z0OGyGI");
-            var httpResponse = (HttpWebResponse)webrequest.GetResponse();
+			String json = new JavaScriptSerializer().Serialize(requestData);
+
+			var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+			client.DefaultRequestHeaders.Add("Authorization", "eyJhbGciOiJIUzI1NiJ9.S2VzdHJhYVVwbG9hZFNlcnZpY2VBcGlLZXk.ybCz7EEcTl8Hjf9lx3zjQdbd1qPcJGn_LBR3z0OGyGI");
+
+			var response = client.PostAsync(urlBase + nrProcesso, content);
 
         }
 
-
+		
     }
 }
