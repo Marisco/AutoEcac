@@ -447,7 +447,7 @@ namespace AutoEcac.Servicos
 						registro.xml_retorno = arquivo;
 
 						var arquivoXml = System.IO.File.ReadAllBytes(this.DiretorioCompleto + "\\" + _NmArquivoNovo);
-						KestraaUploadRequest uploadRequest = new KestraaUploadRequest(arquivoXml, "xml", 
+						KestraaUploadRequest uploadRequest = new KestraaUploadRequest(_NmArquivoNovo, arquivoXml, "xml", 
 							"NUMERODI - XML Acompanhamento", 
 							DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss"),
 							"99999999");
@@ -464,7 +464,7 @@ namespace AutoEcac.Servicos
                         var arquivoPdf = System.IO.File.ReadAllBytes(this.DiretorioCompleto + "\\" + _NmArquivoNovo);
                         registro.pdf_extrato = arquivoPdf;
 
-						uploadRequest = new KestraaUploadRequest(arquivoPdf, "xml",
+						uploadRequest = new KestraaUploadRequest(_NmArquivoNovo, arquivoPdf, "pdf",
 							"NUMERODI - Extrato DI",
 							DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss"),
 							"99999999");
@@ -486,7 +486,7 @@ namespace AutoEcac.Servicos
                             arquivoPdf = System.IO.File.ReadAllBytes(this.DiretorioCompleto + "\\" + _NmArquivoNovo);
                             registro.pdf_comprovante = arquivoPdf;
 
-							uploadRequest = new KestraaUploadRequest(arquivoPdf, "xml",
+							uploadRequest = new KestraaUploadRequest(_NmArquivoNovo, arquivoPdf, "pdf",
 								"NUMERODI - Comprovante",
 								DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss"),
 								"99999999");
@@ -632,7 +632,7 @@ namespace AutoEcac.Servicos
                 pRegistro.in_rodando = 0;
 
 				var arquivoXml = System.IO.File.ReadAllBytes(this.DiretorioCompleto + "\\" + pNumerorDi + "_situacao.xml");
-				KestraaUploadRequest uploadRequest = new KestraaUploadRequest(arquivoXml, "xml",
+				KestraaUploadRequest uploadRequest = new KestraaUploadRequest(pNumerorDi + "_situacao.xml", arquivoXml, "xml",
 							"NUMERODI - XML Acompanhamento",
 							DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss"),
 							"99999999");
@@ -683,7 +683,7 @@ namespace AutoEcac.Servicos
                 pRegistro.in_rodando = 0;
 
 				var arquivoXml = System.IO.File.ReadAllBytes(this.DiretorioCompleto + "\\" + pNumerorDi + "_situacao.xml");
-				KestraaUploadRequest uploadRequest = new KestraaUploadRequest(arquivoXml, "xml",
+				KestraaUploadRequest uploadRequest = new KestraaUploadRequest(pNumerorDi + "_situacao.xml", arquivoXml, "xml",
 							"NUMERODI - XML Comando",
 							DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss"),
 							"99999999");

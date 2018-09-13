@@ -14,7 +14,7 @@ namespace AutoEcac
     public class KestraaUpload
     {
 
-		private static readonly HttpClient client = new HttpClient();
+		private HttpClient client = new HttpClient();
 		private string urlBase = "https://kestraa-upload-qa.azurewebsites.net/upload/Shipments/";
 
 		// instanciar a classe para chamar o servico
@@ -30,7 +30,7 @@ namespace AutoEcac
 		//Authorization:KestraaUploadServiceApiKey eyJhbGciOiJIUzI1NiJ9.S2VzdHJhYVVwbG9hZFNlcnZpY2VBcGlLZXk.ybCz7EEcTl8Hjf9lx3zjQdbd1qPcJGn_LBR3z0OGyGI
 		//Content-Type:application/json
 
-		//body:{header:{}, body:{fileToUpload:132, }}
+		//body:{body:{fileToUpload:132, }}
 		//fileToUpload: arquivo que será enviado
 
 		//fileType:Import Declaration - DI, Receipt of Import - CI
@@ -39,16 +39,21 @@ namespace AutoEcac
 		//userId:99999999
 
 
-		public void enviarArquivosws(KestraaUploadRequest requestData, String nrProcesso)
+		public async void enviarArquivosws(KestraaUploadRequest requestData, String nrProcesso)
         {
-			String json = new JavaScriptSerializer().Serialize(requestData);
 
-			var content = new StringContent(json, Encoding.UTF8, "application/json");
+			try
+			{
+				client.DefaultRequestHeaders.Add("Authorization", "KestraaUploadServiceApiKey eyJhbGciOiJIUzI1NiJ9.S2VzdHJhYVVwbG9hZFNlcnZpY2VBcGlLZXk.ybCz7EEcTl8Hjf9lx3zjQdbd1qPcJGn_LBR3z0OGyGI");
+			} catch(Exception e)
+			{
+				//ja possui o header
+			}
+			
 
-			client.DefaultRequestHeaders.Add("Authorization", "eyJhbGciOiJIUzI1NiJ9.S2VzdHJhYVVwbG9hZFNlcnZpY2VBcGlLZXk.ybCz7EEcTl8Hjf9lx3zjQdbd1qPcJGn_LBR3z0OGyGI");
+			var response = await client.PostAsync(urlBase + nrProcesso, requestData.getFormContent());
 
-			var response = client.PostAsync(urlBase + nrProcesso, content);
-
+			Console.Write("teste");
         }
 
 		

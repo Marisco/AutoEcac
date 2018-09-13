@@ -234,11 +234,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\AutoeCac\\MyFirstProject\\AutoEcac\\AutoEcac.csproj",
+      "projectUniqueName": "C:\\AutoeCac\\MyFirstProject2\\AutoEcac\\AutoEcac.csproj",
       "projectName": "AutoEcac",
-      "projectPath": "C:\\AutoeCac\\MyFirstProject\\AutoEcac\\AutoEcac.csproj",
+      "projectPath": "C:\\AutoeCac\\MyFirstProject2\\AutoEcac\\AutoEcac.csproj",
       "packagesPath": "C:\\Users\\brinn\\.nuget\\packages\\",
-      "outputPath": "C:\\AutoeCac\\MyFirstProject\\AutoEcac\\obj\\",
+      "outputPath": "C:\\AutoeCac\\MyFirstProject2\\AutoEcac\\obj\\",
       "projectStyle": "PackageReference",
       "skipContentFileWrite": true,
       "configFilePaths": [
