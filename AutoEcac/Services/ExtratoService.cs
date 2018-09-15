@@ -20,13 +20,13 @@ namespace AutoEcac.Servicos
         private string _NmArquivoNovo;
         private IWebDriver _browser;
         private roboEntities _db;
-		private KestraaUpload _kestraaUpload;
+        private KestraaUpload _kestraaUpload;
 
         public ExtratoService(IWebDriver browser, roboEntities db)
         {
             _browser = browser;
             _db = db;
-			_kestraaUpload = new KestraaUpload();
+            _kestraaUpload = new KestraaUpload();
         }
 
         public void NavegarURLExtratoDeclaracaoDI()
@@ -43,7 +43,7 @@ namespace AutoEcac.Servicos
         public void AtualizarLI(string pCaminhoComnpleto, ref tsiscomexweb_robo pRegistro)
         {
             string orgaoAnuente = "";
-            int codigoSituacaoAnuencia;
+            int codigoSituacaoAnuencia = 0;
             int inRodando = 0;
 
             XmlDocument xmlLiCompleta = new XmlDocument();
@@ -56,17 +56,16 @@ namespace AutoEcac.Servicos
                 foreach (XmlNode atributo in anuencia.ChildNodes)
                 {
 
-
                     if (atributo.Name == "orgao-anuente")
                     {
                         if (string.IsNullOrEmpty(orgaoAnuente))
                         {
 
-                            orgaoAnuente = "{ orgaoAnuente : { " + atributo.InnerXml + ": ";
+                            orgaoAnuente = "{ orgaoAnuente : [{ " + atributo.InnerXml + ": ";
                         }
                         else
                         {
-                            orgaoAnuente = orgaoAnuente + ", { " + atributo.InnerXml + ": ";
+                            orgaoAnuente = orgaoAnuente + " { " + atributo.InnerXml + ": ";
                         }
                     };
 
@@ -130,49 +129,48 @@ namespace AutoEcac.Servicos
 
             };
 
-            orgaoAnuente = orgaoAnuente + "}";
+            orgaoAnuente = orgaoAnuente + "]}";
 
 
             string OrgaoAnuenteBase = pRegistro.tp_anuencia;
             string OrgaoAnuenteAtual = orgaoAnuente;
 
-            pRegistro.xml_comando = xmlLiCompleta.OuterXml;
-            pRegistro.in_desembaraco = 0;
-            pRegistro.in_rodando = 0;
+            pRegistro.tp_anuencia = OrgaoAnuenteAtual;
+            pRegistro.in_rodando = pRegistro.tp_acao.ToLower() == "acompanha" && inRodando > 0 ? 1 : 0;
 
-            if (pRegistro.tp_acao != "acompanha" && OrgaoAnuenteBase != OrgaoAnuenteAtual)
+            if ((pRegistro.tp_acao.ToLower() == "consulta" && inRodando > 0) || (pRegistro.tp_acao.ToLower() == "acompanha" && OrgaoAnuenteBase != OrgaoAnuenteAtual && inRodando > 0))
             {
                 tsiscomexweb_robo novoRegistro = new tsiscomexweb_robo
-                    {
-                        nr_processo = pRegistro.nr_processo,
-                        nr_registro = pRegistro.nr_registro,
-                        nr_seq = pRegistro.nr_seq,
-                        tp_consulta = pRegistro.tp_consulta,
-                        tp_acao = "acompanha",
-                        dt_agendamento = DateTime.Now.AddMinutes(30),
-                        dt_realizacao = DateTime.Now,
-                        dt_registro_di = pRegistro.dt_registro_di,
-                        nr_tentativas = 1,
-                        tx_erro = "",
-                        cd_usuario = pRegistro.cd_usuario,
-                        cpf_certificado = pRegistro.cpf_certificado,
-                        in_rodando = 1,
-                        in_desembaraco = 0,
-                        tp_anuencia = orgaoAnuente,
-                        in_situacao = 0,
-                        xml_comando = xmlLiCompleta.OuterXml,
-                        xml_retorno = "",
-                        pdf_comprovante = null,
-                        pdf_extrato = null
-                        
-                };                
-                _db.tsiscomexweb_robo.Add(novoRegistro);                
+                {
+                    nr_processo = pRegistro.nr_processo,
+                    nr_registro = pRegistro.nr_registro,
+                    nr_seq = pRegistro.nr_seq,
+                    tp_consulta = pRegistro.tp_consulta,
+                    tp_acao = "acompanha",
+                    dt_agendamento = DateTime.Now.AddMinutes(30),
+                    dt_realizacao = DateTime.Now,
+                    dt_registro_di = pRegistro.dt_registro_di,
+                    nr_tentativas = 1,
+                    tx_erro = "",
+                    cd_usuario = pRegistro.cd_usuario,
+                    cpf_certificado = pRegistro.cpf_certificado,
+                    in_rodando = 1,
+                    in_desembaraco = 0,
+                    tp_anuencia = orgaoAnuente,
+                    in_situacao = 0,
+                    xml_comando = xmlLiCompleta.OuterXml,
+                    xml_retorno = "",
+                    pdf_comprovante = null,
+                    pdf_extrato = null
+
+                };
+                _db.tsiscomexweb_robo.Add(novoRegistro);
             }
             else
             {
-                pRegistro.dt_realizacao  = DateTime.Now;
-                pRegistro.dt_agendamento = DateTime.Now.AddMinutes(30);
-                pRegistro.nr_tentativas  = pRegistro.nr_tentativas++;
+                pRegistro.nr_tentativas = pRegistro.nr_tentativas++;
+                pRegistro.in_desembaraco = OrgaoAnuenteAtual.Contains("DESEMBARAÇADA") ? 1 : 0;
+                pRegistro.xml_retorno = xmlLiCompleta.OuterXml;
             }
 
 
@@ -180,149 +178,164 @@ namespace AutoEcac.Servicos
 
         public void ConsultarLI(Periodo pPeriodo, TipoConsultaExtrato pTipoConsultaExtrato, List<string> pNrConsulta, DateTime pDtInicial, DateTime pDtFinal)
         {
-            base._periodo = pPeriodo;
-
-            foreach (DateTime data in LoopNoPeriodo(pDtInicial, pDtFinal))
+            try
             {
-                Thread.Sleep(1000);
-
-                foreach (string numero in pNrConsulta)
+                base._periodo = pPeriodo;
+                foreach (DateTime data in LoopNoPeriodo(pDtInicial, pDtFinal))
                 {
-                    switch ((int)pTipoConsultaExtrato)
-                    {
-                        case (int)TipoConsultaExtrato.NumeroDeclaracao:
-                            _browser.FindElement(By.Name("numeroLI")).SendKeys(Keys.Delete);
-                            Thread.Sleep(500);
-                            _browser.FindElement(By.Name("numeroLI")).SendKeys(numero);
-                            break;
-                        case (int)TipoConsultaExtrato.CnpjImportador:
-                            _browser.FindElement(By.Name("numeroLI")).SendKeys(Keys.Delete);
-                            Thread.Sleep(500);
-                            _browser.FindElement(By.Name("cnpjImportador")).SendKeys(numero);
-                            break;
-                        case (int)TipoConsultaExtrato.CpfImportador:
-                            _browser.FindElement(By.Name("numeroLI")).SendKeys(Keys.Delete);
-                            Thread.Sleep(500);
-                            _browser.FindElement(By.Name("cpfImportador")).SendKeys(numero);
-                            break;
-                    }
 
                     Thread.Sleep(1000);
 
-                    if (pTipoConsultaExtrato != TipoConsultaExtrato.NumeroDeclaracao)
+                    foreach (string numero in pNrConsulta)
                     {
-                        var dtInicial = _dtInicial.ToShortDateString().Trim().Replace("/", "");
-                        var dtFinal = _dtFinal.ToShortDateString().Trim().Replace("/", "");
+                        base._consultaAtual = numero;
 
-                        var objDataInicial = _browser.FindElement(By.Name("dataInicial"));
-                        var objDataFinal = _browser.FindElement(By.Name("dataFinal"));
+                        switch ((int)pTipoConsultaExtrato)
+                        {
+                            case (int)TipoConsultaExtrato.NumeroDeclaracao:
+                                _browser.FindElement(By.Name("numeroLI")).SendKeys(Keys.Delete);
+                                Thread.Sleep(500);
+                                _browser.FindElement(By.Name("numeroLI")).SendKeys(numero);
+                                break;
+                            case (int)TipoConsultaExtrato.CnpjImportador:
+                                _browser.FindElement(By.Name("numeroLI")).SendKeys(Keys.Delete);
+                                Thread.Sleep(500);
+                                _browser.FindElement(By.Name("cnpjImportador")).SendKeys(numero);
+                                break;
+                            case (int)TipoConsultaExtrato.CpfImportador:
+                                _browser.FindElement(By.Name("numeroLI")).SendKeys(Keys.Delete);
+                                Thread.Sleep(500);
+                                _browser.FindElement(By.Name("cpfImportador")).SendKeys(numero);
+                                break;
+                        }
 
                         Thread.Sleep(1000);
-                        objDataInicial.Clear();
-                        objDataInicial.SendKeys(dtInicial);
+
+                        if (pTipoConsultaExtrato != TipoConsultaExtrato.NumeroDeclaracao)
+                        {
+                            var dtInicial = _dtInicial.ToShortDateString().Trim().Replace("/", "");
+                            var dtFinal = _dtFinal.ToShortDateString().Trim().Replace("/", "");
+
+                            var objDataInicial = _browser.FindElement(By.Name("dataInicial"));
+                            var objDataFinal = _browser.FindElement(By.Name("dataFinal"));
+
+                            Thread.Sleep(1000);
+                            objDataInicial.Clear();
+                            objDataInicial.SendKeys(dtInicial);
+                            Thread.Sleep(1000);
+
+                            objDataFinal.Clear();
+                            objDataFinal.SendKeys(dtFinal);
+                            Thread.Sleep(1000);
+                        }
+
+                        _browser.FindElement(By.Name("enviar")).Click();
                         Thread.Sleep(1000);
 
-                        objDataFinal.Clear();
-                        objDataFinal.SendKeys(dtFinal);
-                        Thread.Sleep(1000);
-                    }
+                        if (pTipoConsultaExtrato != TipoConsultaExtrato.NumeroDeclaracao)
+                        {
+                            List<string> vListaLI = getListaLI();
+                            Thread.Sleep(2000);
+                            ConsultarLI(pPeriodo, 0, vListaLI, DateTime.Now, DateTime.Now);
+                        }
 
-                    _browser.FindElement(By.Name("enviar")).Click();
-                    Thread.Sleep(1000);
-
-                    if (pTipoConsultaExtrato != TipoConsultaExtrato.NumeroDeclaracao)
-                    {
-                        List<string> vListaLI = getListaLI();
-                        Thread.Sleep(2000);
-                        ConsultarLI(pPeriodo, 0, vListaLI, DateTime.Now, DateTime.Now);
-                    }
-
-                    try
-                    {
-                        int numeroLi = int.Parse(numero);
-                        tsiscomexweb_robo registro = _db.tsiscomexweb_robo.Where(reg => reg.nr_registro == numeroLi).First();
-                        Thread.Sleep(2000);
-
-                        _browser.FindElement(By.Id("imprimir")).Click();
-                        Thread.Sleep(2000);
-                        _NmArquivoPadrao = "ExtratoLI.pdf";
-                        _NmArquivoNovo = numero + "_extrato.pdf";
-                        SalvarArquivosBaixados(_NmArquivoNovo, this.DiretorioCompleto);
-                        Thread.Sleep(1000);
-
-                        var arquivoPdf = System.IO.File.ReadAllBytes(this.DiretorioCompleto + "\\" + _NmArquivoNovo);
-                        registro.pdf_extrato = arquivoPdf;
-
-                        _browser.Navigate().Back();
-                        Thread.Sleep(1000);
-                        _browser.Navigate().Back();
-                        Thread.Sleep(1000);
-
-                        _browser.Navigate().GoToUrl("https://www1c.siscomex.receita.fazenda.gov.br/li_web-7/liweb_menu_li_consultar_lote_li.do");
-                        Thread.Sleep(2000);
-
-                        XmlDocument consultaPorLi = new XmlDocument();
-                        consultaPorLi.Load(@"C:\AutoEcac\Arquivos\ConlustaLotePadrao\consultaPorLi.xml");
-                        consultaPorLi.FirstChild.Value = "version=\"1.0\" encoding=\"UTF-8\"";
-                        consultaPorLi.GetElementsByTagName("li").Item(0).InnerText = numero;
-                        //consultaPorLi.Save(@"C:\AutoEcac\Arquivos\ConlustaLotePadrao\consultaPorLi.xml");
-
-                        string fileName = "C:\\AutoEcac\\Arquivos\\ConlustaLotePadrao\\consultaPorLi.xml";
-                        string textToAdd = consultaPorLi.InnerXml;
-                        FileStream fs = null;
                         try
                         {
-                            fs = new FileStream(fileName, FileMode.Truncate);
-                            using (StreamWriter writer = new StreamWriter(fs, new UTF8Encoding(false)))
+                            int numeroLi = int.Parse(numero);
+                            tsiscomexweb_robo registro = _db.tsiscomexweb_robo.Where(reg => reg.nr_registro == numeroLi).First();
+                            Thread.Sleep(2000);
+
+                            _browser.FindElement(By.Id("imprimir")).Click();
+                            Thread.Sleep(2000);
+                            _NmArquivoPadrao = "ExtratoLI.pdf";
+                            _NmArquivoNovo = numero + "_extrato.pdf";
+                            SalvarArquivosBaixados(_NmArquivoNovo, this.DiretorioCompleto);
+                            Thread.Sleep(1000);
+
+                            var arquivoPdf = System.IO.File.ReadAllBytes(this.DiretorioCompleto + "\\" + _NmArquivoNovo);
+                            registro.pdf_extrato = arquivoPdf;
+
+                            //_browser.Navigate().Back();
+                            //Thread.Sleep(1000);
+                            //_browser.Navigate().Back();
+                            Thread.Sleep(1000);
+
+                            _browser.Navigate().GoToUrl("https://www1c.siscomex.receita.fazenda.gov.br/li_web-7/liweb_menu_li_consultar_lote_li.do");
+                            Thread.Sleep(2000);
+
+                            XmlDocument consultaPorLi = new XmlDocument();
+                            consultaPorLi.Load(@"C:\AutoEcac\Arquivos\ConlustaLotePadrao\consultaPorLi.xml");
+                            consultaPorLi.FirstChild.Value = "version=\"1.0\" encoding=\"UTF-8\"";
+                            consultaPorLi.GetElementsByTagName("li").Item(0).InnerText = numero;
+                            string fileName = "C:\\AutoEcac\\Arquivos\\ConlustaLotePadrao\\consultaPorLi.xml";
+                            string textToAdd = consultaPorLi.InnerXml;
+                            FileStream fs = null;
+                            try
                             {
-                                writer.Write(textToAdd);
+                                fs = new FileStream(fileName, FileMode.Truncate);
+                                using (StreamWriter writer = new StreamWriter(fs, new UTF8Encoding(false)))
+                                {
+                                    writer.Write(textToAdd);
+                                }
+                            }
+                            finally
+                            {
+                                if (fs != null)
+                                    fs.Dispose();
+                            }
+
+                            _browser.FindElement(By.Id("arquivo")).Click();
+                            Thread.Sleep(2000);
+                            System.Windows.Forms.SendKeys.SendWait(@"C:\AutoEcac\Arquivos\ConlustaLotePadrao\consultaPorLi.xml");
+                            Thread.Sleep(2000);
+                            System.Windows.Forms.SendKeys.SendWait(@"{Enter}");
+
+
+                            Thread.Sleep(1000);
+                            _browser.FindElement(By.Id("enviarArquivo")).Click();
+                            Thread.Sleep(2000);
+                            _NmArquivoPadrao = "CONSULTA.XXXXXX.xml";
+                            _NmArquivoNovo = numero + "_consulta.xml";
+                            SalvarArquivosBaixados(_NmArquivoNovo, this.DiretorioCompleto);
+                            Thread.Sleep(1000);
+
+                            NavegarURLExtratoDeclaracaoLI();
+
+                            Thread.Sleep(1000);
+
+                            AtualizarLI(this.DiretorioCompleto + "\\" + _NmArquivoNovo, ref registro);
+
+                            _db.SaveChanges();
+
+                        }
+                        catch (Exception e)
+                        {
+                            LogarErros("Erro: Consulta Atual: " + _consultaAtual + " Consulta Anterior: " + _consultaAnterior + " Msg: " + e.Message);
+                            Thread.Sleep(1000);
+                            try
+                            {
+                                _browser.SwitchTo().Alert().Accept();
+
+                            }
+                            catch (Exception)
+                            {
+
+                                LogarErros("Erro: Consulta Atual: " + _consultaAtual + " Consulta Anterior: " + _consultaAnterior + " Msg: " + e.Message);
                             }
                         }
-                        finally
-                        {
-                            if (fs != null)
-                                fs.Dispose();
-                        }
 
-                        _browser.FindElement(By.Id("arquivo")).Click();
-                        Thread.Sleep(2000);
-                        System.Windows.Forms.SendKeys.SendWait(@"C:\AutoEcac\Arquivos\ConlustaLotePadrao\consultaPorLi.xml");
-                        Thread.Sleep(2000);
-                        System.Windows.Forms.SendKeys.SendWait(@"{Enter}");
-
-                        Thread.Sleep(1000);
-                        _browser.FindElement(By.Id("enviarArquivo")).Click();
-                        Thread.Sleep(2000);
-                        _NmArquivoPadrao = "CONSULTA.XXXXXX.xml";
-                        _NmArquivoNovo = numero + "_consulta.xml";
-                        SalvarArquivosBaixados(_NmArquivoNovo, this.DiretorioCompleto);
-                        Thread.Sleep(1000);
-                        _browser.Navigate().Back();
-                        Thread.Sleep(1000);
-
-                        AtualizarLI(this.DiretorioCompleto + "\\" + _NmArquivoNovo, ref registro);
-
-                        _db.SaveChanges();
-
-                    }
-                    catch (Exception)
-                    {
-                        Thread.Sleep(1000);
-                        try
-                        {
-                            _browser.SwitchTo().Alert().Accept();
-
-                        }
-                        catch (Exception)
-                        {
-
-                            // throw;
-                        }
+                        base._consultaAnterior = _consultaAtual;
                     }
 
                 }
+
+                pNrConsulta.Clear();
             }
-            pNrConsulta.Clear();
+            catch (Exception e)
+            {
+                LogarErros("Consulta Antual: " + _consultaAtual + " Consulta Anterior: " + _consultaAnterior + "Msg: " + e.Message);
+
+            }
         }
 
 
@@ -351,9 +364,9 @@ namespace AutoEcac.Servicos
                             vListaLi.Add(vNrLI);
                         }
                     }
-                    catch (Exception)
+                    catch (Exception e)
                     {
-                        // throw;
+                        LogarErros("Consulta Antual: " + _consultaAtual + " Consulta Anterior: " + _consultaAnterior + "Msg: " + e.Message);
                     }
                 }
 
@@ -361,17 +374,18 @@ namespace AutoEcac.Servicos
                 Thread.Sleep(1000);
 
             }
-            catch (Exception)
+            catch (Exception e)
             {
                 Thread.Sleep(1000);
                 try
                 {
+                    LogarErros("Consulta Antual: " + _consultaAtual + " Consulta Anterior: " + _consultaAnterior + "Msg: " + e.Message);
                     _browser.SwitchTo().Alert().Accept();
 
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
-                    // throw;
+                    LogarErros("Consulta Antual: " + _consultaAtual + " Consulta Anterior: " + _consultaAnterior + "Msg: " + ex.Message);
                 }
             }
             return vListaLi;
@@ -379,144 +393,158 @@ namespace AutoEcac.Servicos
 
         public void ConsultarDI(Periodo pPeriodo, TipoConsultaExtrato pTipoConsultaExtrato, List<string> pNrConsulta, DateTime pDtInicial, DateTime pDtFinal)
         {
-            base._periodo = pPeriodo;
-            foreach (DateTime data in LoopNoPeriodo(pDtInicial, pDtFinal))
+            try
             {
-                Thread.Sleep(2000);
 
-                foreach (string numero in pNrConsulta)
+                base._periodo = pPeriodo;
+                foreach (DateTime data in LoopNoPeriodo(pDtInicial, pDtFinal))
                 {
-                    switch ((int)pTipoConsultaExtrato)
-                    {
-                        case (int)TipoConsultaExtrato.NumeroDeclaracao:
-                            _browser.FindElement(By.Name("nrDeclaracao")).Clear();
-                            _browser.FindElement(By.Name("nrDeclaracao")).SendKeys(numero);
-                            break;
-                        case (int)TipoConsultaExtrato.CnpjImportador:
-                            _browser.FindElement(By.Name("cnpjImport")).Clear();
-                            _browser.FindElement(By.Name("cnpjImport")).SendKeys(numero);
-                            break;
-                        case (int)TipoConsultaExtrato.CpfImportador:
-                            _browser.FindElement(By.Name("cpfImport")).Clear();
-                            _browser.FindElement(By.Name("cpfImport")).SendKeys(numero);
-                            break;
-                        case (int)TipoConsultaExtrato.CpfUsuario:
-                            _browser.FindElement(By.Name("cpfUsuario")).Clear();
-                            _browser.FindElement(By.Name("cpfUsuario")).SendKeys(numero);
-                            break;
-                    }
-
                     Thread.Sleep(2000);
 
-                    if (pTipoConsultaExtrato != TipoConsultaExtrato.NumeroDeclaracao)
+                    foreach (string numero in pNrConsulta)
                     {
-                        _browser.FindElement(By.Name("inicioConsulta")).Clear();
-                        _browser.FindElement(By.Name("fimConsulta")).Clear();
+                        base._consultaAtual = numero;
 
-                        _browser.FindElement(By.Name("inicioConsulta")).SendKeys(_dtInicial.ToShortDateString().Trim().Replace("/", ""));
-                        Thread.Sleep(1000);
-
-                        _browser.FindElement(By.Name("fimConsulta")).SendKeys(_dtFinal.ToShortDateString().Trim().Replace("/", ""));
-                        Thread.Sleep(2000);
-                    }
-
-                    _browser.FindElement(By.Name("enviar")).Click();
-                    Thread.Sleep(2000);
-
-                    if (pTipoConsultaExtrato != TipoConsultaExtrato.NumeroDeclaracao)
-                    {
-                        List<string> vListaDI = getListaDI();
-                        Thread.Sleep(2000);
-                        ConsultarDI(pPeriodo, 0, vListaDI, DateTime.Now, DateTime.Now);
-                    }
-                    int nrRegistroDi = Int32.Parse(numero);
-                    tsiscomexweb_robo registro = _db.tsiscomexweb_robo.OrderByDescending(reg => reg.nr_sequencia).Where(reg => reg.nr_registro == nrRegistroDi).First();
-
-
-                    try
-                    {
-                        _browser.FindElement(By.Id("consultarXmlDi")).Click();
-                        Thread.Sleep(2000);
-                        _NmArquivoPadrao = numero + ".xml";
-                        _NmArquivoNovo = numero + "_declaracao.xml";
-                        SalvarArquivosBaixados(_NmArquivoNovo, this.DiretorioCompleto);
-                        Thread.Sleep(2000);
-
-                        var arquivo = System.IO.File.ReadAllText(this.DiretorioCompleto + "\\" + _NmArquivoNovo);
-						
-						registro.xml_retorno = arquivo;
-
-						var arquivoXml = System.IO.File.ReadAllBytes(this.DiretorioCompleto + "\\" + _NmArquivoNovo);
-						KestraaUploadRequest uploadRequest = new KestraaUploadRequest(_NmArquivoNovo, arquivoXml, "xml", 
-							"NUMERODI - XML Acompanhamento", 
-							DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss"),
-							"99999999");
-
-						_kestraaUpload.enviarArquivosws(uploadRequest,registro.nr_processo);
-
-                        _browser.FindElement(By.Id("btnRegistrarDI")).Click();
-                        Thread.Sleep(2000);
-                        _NmArquivoPadrao = "Extrato.pdf";
-                        _NmArquivoNovo = numero + "_extrato.pdf";
-                        SalvarArquivosBaixados(_NmArquivoNovo, this.DiretorioCompleto);
-                        Thread.Sleep(2000);
-
-                        var arquivoPdf = System.IO.File.ReadAllBytes(this.DiretorioCompleto + "\\" + _NmArquivoNovo);
-                        registro.pdf_extrato = arquivoPdf;
-
-						uploadRequest = new KestraaUploadRequest(_NmArquivoNovo, arquivoPdf, "pdf",
-							"NUMERODI - Extrato DI",
-							DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss"),
-							"99999999");
-
-						_kestraaUpload.enviarArquivosws(uploadRequest, registro.nr_processo);
-
-						if (gerarXmlAcompanhamento(numero, ref registro))
+                        switch ((int)pTipoConsultaExtrato)
                         {
-                            _browser.FindElement(By.Id("btnComprovanteDI")).Click();
+                            case (int)TipoConsultaExtrato.NumeroDeclaracao:
+                                _browser.FindElement(By.Name("nrDeclaracao")).Clear();
+                                _browser.FindElement(By.Name("nrDeclaracao")).SendKeys(numero);
+                                break;
+                            case (int)TipoConsultaExtrato.CnpjImportador:
+                                _browser.FindElement(By.Name("cnpjImport")).Clear();
+                                _browser.FindElement(By.Name("cnpjImport")).SendKeys(numero);
+                                break;
+                            case (int)TipoConsultaExtrato.CpfImportador:
+                                _browser.FindElement(By.Name("cpfImport")).Clear();
+                                _browser.FindElement(By.Name("cpfImport")).SendKeys(numero);
+                                break;
+                            case (int)TipoConsultaExtrato.CpfUsuario:
+                                _browser.FindElement(By.Name("cpfUsuario")).Clear();
+                                _browser.FindElement(By.Name("cpfUsuario")).SendKeys(numero);
+                                break;
+                        }
+
+                        Thread.Sleep(2000);
+
+                        if (pTipoConsultaExtrato != TipoConsultaExtrato.NumeroDeclaracao)
+                        {
+                            _browser.FindElement(By.Name("inicioConsulta")).Clear();
+                            _browser.FindElement(By.Name("fimConsulta")).Clear();
+
+                            _browser.FindElement(By.Name("inicioConsulta")).SendKeys(_dtInicial.ToShortDateString().Trim().Replace("/", ""));
                             Thread.Sleep(1000);
-                            _browser.SwitchTo().Window(_browser.WindowHandles.Last());
-                            _browser.FindElement(By.XPath("//input[contains(@value,'Emitir')]")).Click();
+
+                            _browser.FindElement(By.Name("fimConsulta")).SendKeys(_dtFinal.ToShortDateString().Trim().Replace("/", ""));
                             Thread.Sleep(2000);
-                            _NmArquivoPadrao = "COMPROVANTE_DI.pdf";
-                            _NmArquivoNovo = numero + "_comprovante.pdf";
+                        }
+
+                        _browser.FindElement(By.Name("enviar")).Click();
+                        Thread.Sleep(2000);
+
+                        if (pTipoConsultaExtrato != TipoConsultaExtrato.NumeroDeclaracao)
+                        {
+                            List<string> vListaDI = getListaDI();
+                            Thread.Sleep(2000);
+                            ConsultarDI(pPeriodo, 0, vListaDI, DateTime.Now, DateTime.Now);
+                        }
+                        int nrRegistroDi = Int32.Parse(numero);
+                        tsiscomexweb_robo registro = _db.tsiscomexweb_robo.OrderByDescending(reg => reg.nr_sequencia).Where(reg => reg.nr_registro == nrRegistroDi).First();
+
+
+                        try
+                        {
+                            _browser.FindElement(By.Id("consultarXmlDi")).Click();
+                            Thread.Sleep(2000);
+                            _NmArquivoPadrao = numero + ".xml";
+                            _NmArquivoNovo = numero + "_declaracao.xml";
                             SalvarArquivosBaixados(_NmArquivoNovo, this.DiretorioCompleto);
                             Thread.Sleep(2000);
 
-                            arquivoPdf = System.IO.File.ReadAllBytes(this.DiretorioCompleto + "\\" + _NmArquivoNovo);
-                            registro.pdf_comprovante = arquivoPdf;
+                            var arquivo = System.IO.File.ReadAllText(this.DiretorioCompleto + "\\" + _NmArquivoNovo);
 
-							uploadRequest = new KestraaUploadRequest(_NmArquivoNovo, arquivoPdf, "pdf",
-								"NUMERODI - Comprovante",
-								DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss"),
-								"99999999");
+                            registro.xml_retorno = arquivo;
 
-							_kestraaUpload.enviarArquivosws(uploadRequest, registro.nr_processo);
+                            var arquivoXml = System.IO.File.ReadAllBytes(this.DiretorioCompleto + "\\" + _NmArquivoNovo);
+                            KestraaUploadRequest uploadRequest = new KestraaUploadRequest(_NmArquivoNovo, arquivoXml, "xml",
+                                "NUMERODI - XML Acompanhamento",
+                                DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss"),
+                                "99999999");
 
-							_browser.Close();
-                            _browser.SwitchTo().Window(_browser.WindowHandles.First());
+                            _kestraaUpload.enviarArquivosws(uploadRequest, registro.nr_processo);
 
-                        }
-                        _browser.Navigate().Back();
-                        Thread.Sleep(1000);
-                        _browser.Navigate().Back();
+                            _browser.FindElement(By.Id("btnRegistrarDI")).Click();
+                            Thread.Sleep(2000);
+                            _NmArquivoPadrao = "Extrato.pdf";
+                            _NmArquivoNovo = numero + "_extrato.pdf";
+                            SalvarArquivosBaixados(_NmArquivoNovo, this.DiretorioCompleto);
+                            Thread.Sleep(2000);
 
-                    }
-                    catch (Exception)
-                    {
-                        Thread.Sleep(1000);
-                        try
-                        {
-                            _browser.SwitchTo().Alert().Accept();
+                            var arquivoPdf = System.IO.File.ReadAllBytes(this.DiretorioCompleto + "\\" + _NmArquivoNovo);
+                            registro.pdf_extrato = arquivoPdf;
+
+                            uploadRequest = new KestraaUploadRequest(_NmArquivoNovo, arquivoPdf, "pdf",
+                                "NUMERODI - Extrato DI",
+                                DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss"),
+                                "99999999");
+
+                            _kestraaUpload.enviarArquivosws(uploadRequest, registro.nr_processo);
+
+                            if (gerarXmlAcompanhamento(numero, ref registro))
+                            {
+                                _browser.FindElement(By.Id("btnComprovanteDI")).Click();
+                                Thread.Sleep(1000);
+                                _browser.SwitchTo().Window(_browser.WindowHandles.Last());
+                                _browser.FindElement(By.XPath("//input[contains(@value,'Emitir')]")).Click();
+                                Thread.Sleep(2000);
+                                _NmArquivoPadrao = "COMPROVANTE_DI.pdf";
+                                _NmArquivoNovo = numero + "_comprovante.pdf";
+                                SalvarArquivosBaixados(_NmArquivoNovo, this.DiretorioCompleto);
+                                Thread.Sleep(2000);
+
+                                arquivoPdf = System.IO.File.ReadAllBytes(this.DiretorioCompleto + "\\" + _NmArquivoNovo);
+                                registro.pdf_comprovante = arquivoPdf;
+
+                                uploadRequest = new KestraaUploadRequest(_NmArquivoNovo, arquivoPdf, "pdf",
+                                    "NUMERODI - Comprovante",
+                                    DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss"),
+                                    "99999999");
+
+                                _kestraaUpload.enviarArquivosws(uploadRequest, registro.nr_processo);
+
+                                _browser.Close();
+                                _browser.SwitchTo().Window(_browser.WindowHandles.First());
+
+                            }
+                            //_browser.Navigate().Back();
+                            Thread.Sleep(1000);
+                            //_browser.Navigate().Back();
+                            NavegarURLExtratoDeclaracaoDI();
 
                         }
                         catch (Exception)
                         {
+                            Thread.Sleep(1000);
+                            try
+                            {
+                                _browser.SwitchTo().Alert().Accept();
 
-                            // throw;
+                            }
+                            catch (Exception)
+                            {
+
+                                // throw;
+                            }
                         }
+
+                        base._consultaAnterior = base._consultaAtual;
                     }
                 }
+            }
+            catch (Exception e)
+            {
+                LogarErros("Consulta Antual: " + _consultaAtual + " Consulta Anterior: " + _consultaAnterior + "Msg: " + e.Message);
+
             }
             pNrConsulta.Clear();
             _db.SaveChanges();
@@ -631,15 +659,15 @@ namespace AutoEcac.Servicos
                 pRegistro.in_desembaraco = 0;
                 pRegistro.in_rodando = 0;
 
-				var arquivoXml = System.IO.File.ReadAllBytes(this.DiretorioCompleto + "\\" + pNumerorDi + "_situacao.xml");
-				KestraaUploadRequest uploadRequest = new KestraaUploadRequest(pNumerorDi + "_situacao.xml", arquivoXml, "xml",
-							"NUMERODI - XML Acompanhamento",
-							DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss"),
-							"99999999");
+                var arquivoXml = System.IO.File.ReadAllBytes(this.DiretorioCompleto + "\\" + pNumerorDi + "_situacao.xml");
+                KestraaUploadRequest uploadRequest = new KestraaUploadRequest(pNumerorDi + "_situacao.xml", arquivoXml, "xml",
+                            "NUMERODI - XML Acompanhamento",
+                            DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss"),
+                            "99999999");
 
-				_kestraaUpload.enviarArquivosws(uploadRequest, pRegistro.nr_processo);
+                _kestraaUpload.enviarArquivosws(uploadRequest, pRegistro.nr_processo);
 
-				if (pRegistro.tp_acao != "acompanha")
+                if (pRegistro.tp_acao != "acompanha")
                 {
                     tsiscomexweb_robo novoRegistro = new tsiscomexweb_robo
                     {
@@ -682,14 +710,14 @@ namespace AutoEcac.Servicos
                 pRegistro.in_desembaraco = 1;
                 pRegistro.in_rodando = 0;
 
-				var arquivoXml = System.IO.File.ReadAllBytes(this.DiretorioCompleto + "\\" + pNumerorDi + "_situacao.xml");
-				KestraaUploadRequest uploadRequest = new KestraaUploadRequest(pNumerorDi + "_situacao.xml", arquivoXml, "xml",
-							"NUMERODI - XML Comando",
-							DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss"),
-							"99999999");
+                var arquivoXml = System.IO.File.ReadAllBytes(this.DiretorioCompleto + "\\" + pNumerorDi + "_situacao.xml");
+                KestraaUploadRequest uploadRequest = new KestraaUploadRequest(pNumerorDi + "_situacao.xml", arquivoXml, "xml",
+                            "NUMERODI - XML Comando",
+                            DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss"),
+                            "99999999");
 
-				_kestraaUpload.enviarArquivosws(uploadRequest, pRegistro.nr_processo);
-			}
+                _kestraaUpload.enviarArquivosws(uploadRequest, pRegistro.nr_processo);
+            }
 
             _browser.Close();
             _browser.SwitchTo().Window(_browser.WindowHandles.First());

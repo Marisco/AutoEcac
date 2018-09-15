@@ -184,6 +184,7 @@ namespace AutoEcac
             var options = new ChromeOptions();
             options.AddArguments("disable-infobars");
             options.AddArgument("--safebrowsing-disable-download-protection");
+            //options.AddArguments($"user-data-dir=C:/Users/{Environment.UserName}/AppData/Local/Google/Chrome/User Data/Default");
             options.AddUserProfilePreference("download.prompt_for_download", false);
             options.AddUserProfilePreference("download.directory_upgrade", true);
             options.AddUserProfilePreference("safebrowsing.enabled", true);
@@ -342,7 +343,7 @@ namespace AutoEcac
                             if (cbxBancoDados.Checked)
                             {
 
-                                foreach (var row in db.tsiscomexweb_robo.Where(reg => reg.tp_consulta == "LI" && reg.in_rodando == 1 && reg.in_desembaraco == 0))
+                                foreach (var row in db.tsiscomexweb_robo.Where(reg => reg.tp_consulta == "LI" && reg.in_rodando == 1).OrderBy(reg => reg.nr_registro))
                                 {
                                     if (row.tp_acao == "consulta" || (row.tp_acao == "acompanha" && row.dt_agendamento <= DateTime.Now))
                                     {
@@ -375,6 +376,7 @@ namespace AutoEcac
                         {
                             vListaNrConsulta.Add(edtNrConsultaDI.Text.Trim());
                         }
+
                         
                         foreach (string cpf in vListaCpf)
                         {

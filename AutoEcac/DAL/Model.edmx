@@ -58,7 +58,7 @@
           <Property Name="cpf_certificado" Type="String" MaxLength="11" FixedLength="false" Unicode="false" Nullable="false" />
           <Property Name="in_rodando" Type="Int32" Nullable="false" />
           <Property Name="in_desembaraco" Type="Int32" />
-          <Property Name="tp_anuencia" Type="String" MaxLength="45" FixedLength="false" Unicode="false" />
+          <Property Name="tp_anuencia" Type="String" MaxLength="256" FixedLength="false" Unicode="false" />
           <Property Name="in_situacao" Type="Int32" />
           <Property Name="xml_comando" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
           <Property Name="xml_retorno" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />

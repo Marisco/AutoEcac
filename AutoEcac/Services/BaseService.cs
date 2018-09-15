@@ -26,7 +26,9 @@ namespace AutoEcac.Services
         protected Periodo _periodo;
         protected DateTime _dtInicial;
         protected DateTime _dtFinal;
-        
+        protected string _consultaAnterior;
+        protected string _consultaAtual;
+
 
         protected IEnumerable<DateTime> LoopNoPeriodo(DateTime pDtInicial, DateTime pDtFinal)
         {
@@ -106,6 +108,15 @@ namespace AutoEcac.Services
             }
         }
 
+        protected void LogarErros(string e)
+        {
+            if (!System.IO.File.Exists(this.DiretorioCompleto + @"\" + "LogErro.txt"))
+            {
+                System.IO.File.Create(this.DiretorioCompleto + @"\" + "LogErro.txt");
+            }
+            File.AppendAllLines(this.DiretorioCompleto + @"\" + "LogErro.txt", new[] { e });
+        }
+
         protected void SalvarArquivosBaixados(string pNmArquivoNovo, string pDiretorio)
         {
             if(_tipoServicoSelecionado == TipoServico.DARF)
@@ -121,10 +132,7 @@ namespace AutoEcac.Services
             {
                 System.IO.File.Delete(pDiretorio + @"\" + pNmArquivoNovo);
             }
-            if (!System.IO.File.Exists(pDiretorio + @"\" + "LogErro.txt"))
-            {
-                System.IO.File.Create(pDiretorio + @"\" + "LogErro.txt");
-            }
+           
 
             var vStopWach = new Stopwatch();
             vStopWach.Start();
@@ -136,7 +144,7 @@ namespace AutoEcac.Services
 
             if (vStopWach.Elapsed.TotalSeconds >= 10)
             {
-                File.AppendAllLines(pDiretorio + @"\" + "LogErro.txt", new[] { "Erro: o arquivo " + _NmArquivoPadrao + " não foi encontrado na pasta " + this.PathDownload });
+                LogarErros("Aviso: Aquardando arquivo " + _NmArquivoPadrao + " a ser baixado na pasta " + this.PathDownload); 
             }
 
             else
