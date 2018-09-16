@@ -420,9 +420,7 @@ namespace AutoEcac
                             }
                             
                             Thread tSeta = new Thread(() => _extratoService.SetarCertificado(qtdSetas));
-                            tSeta.Start();
-                            Browser = ConfigurarBrowser();
-                            IniciarOperacao();
+                            tSeta.Start();                            
                             _extratoService.AbrirBrowser();
                             _extratoService.NavegarURLExtratoDeclaracaoLI();
                             Thread.Sleep(2000);
