@@ -310,7 +310,7 @@ namespace AutoEcac.Servicos
                         }
                         catch (Exception e)
                         {
-                            LogarErros("Erro: Consulta Atual: " + _consultaAtual + " Consulta Anterior: " + _consultaAnterior + " Msg: " + e.Message);
+                            LogarErros(DateTime.Now.ToString() + " Erro: Consulta Atual: " + _consultaAtual + " Consulta Anterior: " + _consultaAnterior + " Msg: " + e.Message);
                             Thread.Sleep(1000);
                             try
                             {
@@ -320,7 +320,7 @@ namespace AutoEcac.Servicos
                             catch (Exception)
                             {
 
-                                LogarErros("Erro: Consulta Atual: " + _consultaAtual + " Consulta Anterior: " + _consultaAnterior + " Msg: " + e.Message);
+                                LogarErros(DateTime.Now.ToString() +" Erro: Consulta Atual: " + _consultaAtual + " Consulta Anterior: " + _consultaAnterior + " Msg: " + e.Message);
                             }
                         }
 
@@ -333,7 +333,7 @@ namespace AutoEcac.Servicos
             }
             catch (Exception e)
             {
-                LogarErros("Consulta Antual: " + _consultaAtual + " Consulta Anterior: " + _consultaAnterior + "Msg: " + e.Message);
+                LogarErros(DateTime.Now.ToString() + " Consulta Antual: " + _consultaAtual + " Consulta Anterior: " + _consultaAnterior + "Msg: " + e.Message);
 
             }
         }
@@ -366,7 +366,7 @@ namespace AutoEcac.Servicos
                     }
                     catch (Exception e)
                     {
-                        LogarErros("Consulta Antual: " + _consultaAtual + " Consulta Anterior: " + _consultaAnterior + "Msg: " + e.Message);
+                        LogarErros(DateTime.Now.ToString() + " Consulta Antual: " + _consultaAtual + " Consulta Anterior: " + _consultaAnterior + "Msg: " + e.Message);
                     }
                 }
 
@@ -379,13 +379,13 @@ namespace AutoEcac.Servicos
                 Thread.Sleep(1000);
                 try
                 {
-                    LogarErros("Consulta Antual: " + _consultaAtual + " Consulta Anterior: " + _consultaAnterior + "Msg: " + e.Message);
+                    LogarErros(DateTime.Now.ToString() + " Consulta Antual: " + _consultaAtual + " Consulta Anterior: " + _consultaAnterior + "Msg: " + e.Message);
                     _browser.SwitchTo().Alert().Accept();
 
                 }
                 catch (Exception ex)
                 {
-                    LogarErros("Consulta Antual: " + _consultaAtual + " Consulta Anterior: " + _consultaAnterior + "Msg: " + ex.Message);
+                    LogarErros(DateTime.Now.ToString() + " Consulta Antual: " + _consultaAtual + " Consulta Anterior: " + _consultaAnterior + "Msg: " + ex.Message);
                 }
             }
             return vListaLi;
@@ -543,7 +543,7 @@ namespace AutoEcac.Servicos
             }
             catch (Exception e)
             {
-                LogarErros("Consulta Antual: " + _consultaAtual + " Consulta Anterior: " + _consultaAnterior + "Msg: " + e.Message);
+                LogarErros(DateTime.Now.ToString() + " Consulta Antual: " + _consultaAtual + " Consulta Anterior: " + _consultaAnterior + "Msg: " + e.Message);
 
             }
             pNrConsulta.Clear();
@@ -905,10 +905,21 @@ namespace AutoEcac.Servicos
 
         public void AbrirBrowser()
         {
-            _browser.Navigate().GoToUrl(URL_EXTRATO_LOGIN);
+            _browser.Navigate().GoToUrl("https://www1.siscomex.receita.fazenda.gov.br/siscomexImpweb-7/login_cert.jsp");
             _browser.FindElement(By.XPath("//img[contains(@src,'certificado')]")).Click();
 
 
+        }
+
+        public void SetarCertificado(int qtdSetas)
+        {
+            Thread.Sleep(30000);
+            for(int i =0; i<= qtdSetas; i++)
+            {
+                System.Windows.Forms.SendKeys.SendWait(@"{DOWN}");
+            }
+
+            System.Windows.Forms.SendKeys.SendWait(@"{Enter}");
         }
     }
 }

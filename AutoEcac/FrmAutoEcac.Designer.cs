@@ -61,7 +61,8 @@
             this.gbExtrato = new System.Windows.Forms.GroupBox();
             this.cbxBancoDados = new System.Windows.Forms.CheckBox();
             this.btnServico = new System.Windows.Forms.Button();
-            this.tempo = new System.Windows.Forms.Timer(this.components);
+            this.tempoDI = new System.Windows.Forms.Timer(this.components);
+            this.tempoLI = new System.Windows.Forms.Timer(this.components);
             this.grpDatas.SuspendLayout();
             this.grpServicos.SuspendLayout();
             this.grpPerfil.SuspendLayout();
@@ -371,7 +372,7 @@
             this.rbConsultaDI.AutoSize = true;
             this.rbConsultaDI.Checked = true;
             this.rbConsultaDI.Location = new System.Drawing.Point(10, 20);
-            this.rbConsultaDI.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.rbConsultaDI.Margin = new System.Windows.Forms.Padding(2);
             this.rbConsultaDI.Name = "rbConsultaDI";
             this.rbConsultaDI.Size = new System.Drawing.Size(36, 17);
             this.rbConsultaDI.TabIndex = 23;
@@ -383,7 +384,7 @@
             // 
             this.rbConsultaLI.AutoSize = true;
             this.rbConsultaLI.Location = new System.Drawing.Point(64, 20);
-            this.rbConsultaLI.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.rbConsultaLI.Margin = new System.Windows.Forms.Padding(2);
             this.rbConsultaLI.Name = "rbConsultaLI";
             this.rbConsultaLI.Size = new System.Drawing.Size(34, 17);
             this.rbConsultaLI.TabIndex = 24;
@@ -396,9 +397,9 @@
             this.gbExtrato.Controls.Add(this.rbConsultaDI);
             this.gbExtrato.Controls.Add(this.rbConsultaLI);
             this.gbExtrato.Location = new System.Drawing.Point(9, 202);
-            this.gbExtrato.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.gbExtrato.Margin = new System.Windows.Forms.Padding(2);
             this.gbExtrato.Name = "gbExtrato";
-            this.gbExtrato.Padding = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.gbExtrato.Padding = new System.Windows.Forms.Padding(2);
             this.gbExtrato.Size = new System.Drawing.Size(252, 42);
             this.gbExtrato.TabIndex = 25;
             this.gbExtrato.TabStop = false;
@@ -409,7 +410,7 @@
             this.cbxBancoDados.AutoSize = true;
             this.cbxBancoDados.ForeColor = System.Drawing.Color.Red;
             this.cbxBancoDados.Location = new System.Drawing.Point(117, 20);
-            this.cbxBancoDados.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.cbxBancoDados.Margin = new System.Windows.Forms.Padding(2);
             this.cbxBancoDados.Name = "cbxBancoDados";
             this.cbxBancoDados.Size = new System.Drawing.Size(106, 17);
             this.cbxBancoDados.TabIndex = 25;
@@ -432,10 +433,15 @@
             this.btnServico.UseVisualStyleBackColor = false;
             this.btnServico.Click += new System.EventHandler(this.btnServico_Click);
             // 
-            // tempo
+            // tempoDI
             // 
-            this.tempo.Interval = 60000;
-            this.tempo.Tick += new System.EventHandler(this.tempo_Tick);
+            this.tempoDI.Interval = 60000;
+            this.tempoDI.Tick += new System.EventHandler(this.tempoDI_Tick);
+            // 
+            // tempoLI
+            // 
+            this.tempoLI.Interval = 60000;
+            this.tempoLI.Tick += new System.EventHandler(this.tempoLI_Tick);
             // 
             // frmAutoEcac
             // 
@@ -506,7 +512,8 @@
         private System.Windows.Forms.RadioButton rbConsultaLI;
 		private System.Windows.Forms.CheckBox cbxBancoDados;
 		private System.Windows.Forms.Button btnServico;
-		private System.Windows.Forms.Timer tempo;
-	}
+		private System.Windows.Forms.Timer tempoDI;
+        private System.Windows.Forms.Timer tempoLI;
+    }
 }
 

@@ -23,6 +23,7 @@ using System.Xml.Linq;
 using System.Text;
 using System.IO;
 using AutoEcac.model;
+using System.Globalization;
 
 namespace AutoEcac
 {
@@ -196,9 +197,11 @@ namespace AutoEcac
 
         private void Form1_Load(object sender, EventArgs e)
         {
-			Browser = ConfigurarBrowser();
+            CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.GetCultureInfo("en-US");
+            //Browser = ConfigurarBrowser();
             cbxServico.SelectedIndex = 0;
             cbxperiodo.SelectedIndex = 0;
+
             rdbNrDeclaracao.PerformClick();
         }
 
@@ -228,7 +231,7 @@ namespace AutoEcac
 
         private void btnOK_Click(object sender, EventArgs e)
         {
-            Boolean PerfilValido = AlterarPerfil();
+            Boolean PerfilValido = AlterarPerfil();            
 
             if (!PerfilValido)
             {
@@ -242,7 +245,6 @@ namespace AutoEcac
 
             if (PerfilValido && ValidarCampos())
             {
-                Thread.Sleep(2000);
                 Browser = ConfigurarBrowser();
                 IniciarOperacao();
 
@@ -257,7 +259,15 @@ namespace AutoEcac
 
                     vFrmCodReceita.Dispose();
 
-                    _darfService.ConsultarDARF(PeriodoSelecionado, this.fCdReceita, dtpInicial.Value, dtpFinal.Value);
+                    Thread.Sleep(2000);
+                    Browser = ConfigurarBrowser();
+                    IniciarOperacao();
+
+                    Periodo periodo = PeriodoSelecionado;
+                    Thread t = new Thread(() => _darfService.ConsultarDARF(periodo, this.fCdReceita, dtpInicial.Value, dtpFinal.Value));
+                    t.Start();
+
+
 
                 }
                 else if (TipoServicoSelecionado == TipoServico.EXTRATO)
@@ -308,17 +318,29 @@ namespace AutoEcac
 
                         }
 
+                        var store = new X509Store(StoreLocation.CurrentUser);
+                        store.Open(OpenFlags.ReadOnly);
+                        var certificados = store.Certificates.OfType<X509Certificate2>().Where(x => x.Issuer.Contains("Secretaria da Receita Federal do Brasil")).OrderBy(x => x.Subject);
+
+                        int qtdSetas = 0;
                         foreach (string cpf in vListaCpf)
                         {
-                            FinalizarOperacao();                            
-                            
-                            Browser = ConfigurarBrowser();
+                            int i = 0;
+                            foreach (var certificado in certificados)
+                            {
+                                if (certificado.FriendlyName.Contains(cpf))
+                                {
+                                    qtdSetas = i++;
 
-                            IniciarOperacao();
+                                }
+                                i++;
+                            }
+
+                            Thread tSeta = new Thread(() => _extratoService.SetarCertificado(qtdSetas));
+                            tSeta.Start();
                             _extratoService.AbrirBrowser();
                             _extratoService.NavegarURLExtratoDeclaracaoDI();
                             Thread.Sleep(2000);
-
                             foreach (string di in vListaNrConsulta)
                             {
                                 if (cpf == di.ToString().Split(';')[1].Trim())
@@ -326,9 +348,9 @@ namespace AutoEcac
                                     vListaDi.Add(di.ToString().Split(';')[0]);
                                 }
                             }
-
-                            _extratoService.ConsultarDI(PeriodoSelecionado, TipoConsultaExtratoSelecionado, vListaDi, dtpInicial.Value, dtpFinal.Value);
-
+                            Periodo periodo = PeriodoSelecionado;
+                            Thread t = new Thread(() => _extratoService.ConsultarDI(periodo, TipoConsultaExtratoSelecionado, vListaDi, dtpInicial.Value, dtpFinal.Value));
+                            t.Start();
                         }
 
 
@@ -342,8 +364,9 @@ namespace AutoEcac
                         {
                             if (cbxBancoDados.Checked)
                             {
+                                var selecaoLI = db.tsiscomexweb_robo.Where(reg => reg.tp_consulta == "LI" && reg.in_rodando == 1).OrderBy(reg => reg.nr_registro);
 
-                                foreach (var row in db.tsiscomexweb_robo.Where(reg => reg.tp_consulta == "LI" && reg.in_rodando == 1).OrderBy(reg => reg.nr_registro))
+                                foreach (var row in selecaoLI)
                                 {
                                     if (row.tp_acao == "consulta" || (row.tp_acao == "acompanha" && row.dt_agendamento <= DateTime.Now))
                                     {
@@ -377,10 +400,27 @@ namespace AutoEcac
                             vListaNrConsulta.Add(edtNrConsultaDI.Text.Trim());
                         }
 
-                        
+
+                        var store = new X509Store(StoreLocation.CurrentUser);
+                        store.Open(OpenFlags.ReadOnly);                        
+                        var certificados = store.Certificates.OfType<X509Certificate2>().Where(x => x. Issuer.Contains("Secretaria da Receita Federal do Brasil")).OrderBy(x => x.Subject);
+
+                        int qtdSetas = 0;
                         foreach (string cpf in vListaCpf)
                         {
-                            FinalizarOperacao();
+                            int i = 0;
+                            foreach (var certificado in certificados)
+                            {
+                                if (certificado.FriendlyName.Contains(cpf))
+                                {
+                                    qtdSetas = i++;
+
+                                }
+                                i++;
+                            }
+                            
+                            Thread tSeta = new Thread(() => _extratoService.SetarCertificado(qtdSetas));
+                            tSeta.Start();
                             Browser = ConfigurarBrowser();
                             IniciarOperacao();
                             _extratoService.AbrirBrowser();
@@ -393,30 +433,15 @@ namespace AutoEcac
                                     vListaDi.Add(di.ToString().Split(';')[0]);
                                 }
                             }
-
-                            _extratoService.ConsultarLI(PeriodoSelecionado, TipoConsultaExtratoSelecionado, vListaDi, dtpInicial.Value, dtpFinal.Value);
+                            Periodo periodo = PeriodoSelecionado;
+                            Thread t = new Thread(() => _extratoService.ConsultarLI(periodo, TipoConsultaExtratoSelecionado, vListaDi, dtpInicial.Value, dtpFinal.Value));
+                            t.Start();
                         }
 
                     }
                 }
 
-                Thread.Sleep(2000);
-                Browser.Navigate().Back();
-
-                //antes de limpar fazer update no banco
-
-                string nrdeclaracoes = string.Empty;
-
-                for (int i = 0; i < dgvNrDelacaracao.RowCount; i++)
-                {
-                    nrdeclaracoes += "'" + dgvNrDelacaracao.Rows[i].Cells[0].Value + "',";
-                }
-
-                if (!string.IsNullOrEmpty(nrdeclaracoes))
-                {
-                    GravarnoBanco(nrdeclaracoes);
-
-                }
+                Thread.Sleep(2000);                
 
                 dgvNrDelacaracao.Rows.Clear();
 
@@ -562,6 +587,7 @@ namespace AutoEcac
         }
 
         public string URL_EXTRATO_LOGIN { get; private set; }
+        public string URL_EXTRATO_DECLARACAO_LI { get; private set; }
 
         #endregion
 
@@ -616,17 +642,26 @@ namespace AutoEcac
 
         private void btnServico_Click(object sender, EventArgs e)
         {
-            tempo.Enabled = true;
+            tempoDI.Enabled = true;
+            tempoLI.Enabled = true;
 
         }
 
-        private void tempo_Tick(object sender, EventArgs e)
+        private void tempoDI_Tick(object sender, EventArgs e)
         {
-            conectarBanco();
+            rbConsultaDI.Checked = true;
+            cbxBancoDados.Checked = true;
+            panel3_MouseClick(sender, null);
             btnOK_Click(sender, e);
 
         }
 
-
+        private void tempoLI_Tick(object sender, EventArgs e)
+        {
+            rbConsultaLI.Checked = true;
+            cbxBancoDados.Checked = true;
+            panel3_MouseClick(sender, null);
+            btnOK_Click(sender, e);
+        }
     }
 }

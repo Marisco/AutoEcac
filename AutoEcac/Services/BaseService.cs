@@ -144,7 +144,7 @@ namespace AutoEcac.Services
 
             if (vStopWach.Elapsed.TotalSeconds >= 10)
             {
-                LogarErros("Aviso: Aquardando arquivo " + _NmArquivoPadrao + " a ser baixado na pasta " + this.PathDownload); 
+                LogarErros(DateTime.Now.ToString() + " Aviso: Aquardando arquivo " + _NmArquivoPadrao + " a ser baixado na pasta " + this.PathDownload); 
             }
 
             else
