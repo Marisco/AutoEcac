@@ -229,20 +229,20 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\chmar\\.nuget\\packages\\": {}
+    "C:\\Users\\brinn\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\_Kestra\\AutoEcac\\AutoEcac.csproj",
+      "projectUniqueName": "C:\\AutoeCac\\MyFirstProject\\AutoEcac\\AutoEcac.csproj",
       "projectName": "AutoEcac",
-      "projectPath": "C:\\_Kestra\\AutoEcac\\AutoEcac.csproj",
-      "packagesPath": "C:\\Users\\chmar\\.nuget\\packages\\",
-      "outputPath": "C:\\_Kestra\\AutoEcac\\obj\\",
+      "projectPath": "C:\\AutoeCac\\MyFirstProject\\AutoEcac\\AutoEcac.csproj",
+      "packagesPath": "C:\\Users\\brinn\\.nuget\\packages\\",
+      "outputPath": "C:\\AutoeCac\\MyFirstProject\\AutoEcac\\obj\\",
       "projectStyle": "PackageReference",
       "skipContentFileWrite": true,
       "configFilePaths": [
-        "C:\\Users\\chmar\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\brinn\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
