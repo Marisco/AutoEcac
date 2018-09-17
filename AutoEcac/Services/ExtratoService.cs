@@ -12,6 +12,7 @@ using System.Threading;
 using System.Xml;
 using Newtonsoft.Json;
 using AutoEcac.model;
+using OpenQA.Selenium.Support.UI;
 
 namespace AutoEcac.Servicos
 {
@@ -548,6 +549,7 @@ namespace AutoEcac.Servicos
             }
             pNrConsulta.Clear();
             _db.SaveChanges();
+            _browser.Quit();
         }
 
         private Boolean gerarXmlAcompanhamento(string pNumerorDi, ref tsiscomexweb_robo pRegistro)
@@ -905,9 +907,18 @@ namespace AutoEcac.Servicos
 
         public void AbrirBrowser()
         {
-            _browser.Navigate().GoToUrl("https://www1.siscomex.receita.fazenda.gov.br/siscomexImpweb-7/login_cert.jsp");
-            _browser.FindElement(By.XPath("//img[contains(@src,'certificado')]")).Click();
+            try
+            {
+                _browser.Navigate().GoToUrl(URL_EXTRATO_LOGIN);
+                _browser.FindElement(By.XPath("//img[contains(@src,'certificado')]")).Click();
+                
+            }
+            catch (Exception e)
+            {                
+                LogarErros(DateTime.Now.ToString() + " Erro no login a tela não estava em foco ou demorou muito para carregar Msg:" + e.Message);                
 
+            }
+            
 
         }
 

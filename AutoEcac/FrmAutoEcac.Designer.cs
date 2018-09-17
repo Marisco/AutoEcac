@@ -435,7 +435,8 @@
             // 
             // tempoDI
             // 
-            this.tempoDI.Interval = 60000;
+            this.tempoDI.Enabled = true;
+            this.tempoDI.Interval = 30000;
             this.tempoDI.Tick += new System.EventHandler(this.tempoDI_Tick);
             // 
             // tempoLI
