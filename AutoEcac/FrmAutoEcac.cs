@@ -34,40 +34,16 @@ namespace AutoEcac
         private string fCdReceita;
         protected IWebDriver Browser;
         protected roboEntities db;
+        ExtratoService _extratoRodando = new ExtratoService();
 
 
         public frmAutoEcac()
         {
             InitializeComponent();
-            btnServico.Enabled = false;
-            cbxBancoDados.Checked = false;
+            //btnServico.Enabled = false;
+            //cbxBancoDados.Checked = false;
             //Browser = ConfigurarBrowser();
             LimpaServicos();
-        }
-
-        private void conectarBanco()
-        {
-            string connStr = ConfigurationManager.ConnectionStrings["myConnectionString"].ConnectionString;
-
-            using (MySqlConnection mysql = new MySqlConnection(connStr))
-            {
-                mysql.Open();
-                MySqlCommand command = new MySqlCommand("Select * from TSISCOMEXWEB_ROBO where tp_consulta = 'DI' and tp_acao = 'consulta' and in_rodando = 1", mysql);
-                MySqlDataReader rdr = command.ExecuteReader();
-
-                dgvNrDelacaracao.Rows.Clear();
-
-
-                while (rdr.Read())
-                {
-                    //Console.WriteLine(rdr.GetString("tp_consulta") + " -- " + rdr[1] + " --- " + rdr[2] + "----" + rdr[0]);
-
-                    dgvNrDelacaracao.Rows.Add(rdr.GetString("nr_registro_di"));
-
-                }
-                mysql.Close();
-            }
-
         }
 
         private void LimpaServicos()
@@ -191,7 +167,7 @@ namespace AutoEcac
             options.AddUserProfilePreference("safebrowsing.enabled", true);
             //options.LeaveBrowserRunning = true;
             //options.AcceptInsecureCertificates = true;
-            return  new ChromeDriver(service, options);                       
+            return new ChromeDriver(service, options);
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -200,197 +176,76 @@ namespace AutoEcac
             //Browser = ConfigurarBrowser();
             cbxServico.SelectedIndex = 0;
             cbxperiodo.SelectedIndex = 0;
-
             rdbNrDeclaracao.PerformClick();
-        }
 
-        private void GravarnoBanco(string nrdeclaracoes)
-        {
-
-            if (nrdeclaracoes.Length > 0)
-            {
-                nrdeclaracoes = nrdeclaracoes.Substring(0, nrdeclaracoes.Length - 1);
-            }
-
-
-            string connStr = ConfigurationManager.ConnectionStrings["myConnectionString"].ConnectionString;
-
-            using (MySqlConnection mysql = new MySqlConnection(connStr))
-            {
-                mysql.Open();
-                MySqlCommand command = new MySqlCommand("Update TSISCOMEXWEB_ROBO set in_rodando=0 where tp_consulta = 'DI' and tp_acao = 'consulta' and nr_registro_di in(" + nrdeclaracoes + ")", mysql);
-
-                command.ExecuteNonQuery();
-
-
-                mysql.Close();
-            }
         }
         #region Eventos Clicks
 
         private void btnOK_Click(object sender, EventArgs e)
-        {
-            Boolean PerfilValido = AlterarPerfil();            
+        {     
+            Browser = ConfigurarBrowser();
+            IniciarOperacao();
 
-            if (!PerfilValido)
+            if (TipoServicoSelecionado == TipoServico.DARF)
             {
-                Browser.Quit();
-                Thread.Sleep(2000);
-                Browser.Dispose();
-                Thread.Sleep(2000);
+                var vFrmCodReceita = new frmCodReceita();
 
-                IniciarOperacao();
-            }
+                if (vFrmCodReceita.ShowDialog(this) == DialogResult.OK)
+                {
+                    this.fCdReceita = vFrmCodReceita.fCdReceita;
+                }
 
-            if (PerfilValido && ValidarCampos())
-            {
+                vFrmCodReceita.Dispose();
+
+                Thread.Sleep(2000);
                 Browser = ConfigurarBrowser();
                 IniciarOperacao();
 
-                if (TipoServicoSelecionado == TipoServico.DARF)
-                {
-                    var vFrmCodReceita = new frmCodReceita();
+                Periodo periodo = PeriodoSelecionado;
+                Thread t = new Thread(() => _darfService.ConsultarDARF(periodo, this.fCdReceita, dtpInicial.Value, dtpFinal.Value));
+                t.Start();
 
-                    if (vFrmCodReceita.ShowDialog(this) == DialogResult.OK)
+
+
+            }
+            else if (TipoServicoSelecionado == TipoServico.EXTRATO)
+            {
+
+
+                List<string> vListaNrConsulta = new List<string>();
+                List<string> vListaCpf = new List<string>();
+                List<string> vListaDi = new List<string>();
+
+                if (TipoExtratoSelecionado == TipoExtrato.DI)
+                {                    
+                    if (TipoConsultaExtratoSelecionado == TipoConsultaExtrato.NumeroDeclaracao)
                     {
-                        this.fCdReceita = vFrmCodReceita.fCdReceita;
-                    }
-
-                    vFrmCodReceita.Dispose();
-
-                    Thread.Sleep(2000);
-                    Browser = ConfigurarBrowser();
-                    IniciarOperacao();
-
-                    Periodo periodo = PeriodoSelecionado;
-                    Thread t = new Thread(() => _darfService.ConsultarDARF(periodo, this.fCdReceita, dtpInicial.Value, dtpFinal.Value));
-                    t.Start();
-
-
-
-                }
-                else if (TipoServicoSelecionado == TipoServico.EXTRATO)
-                {
-                    List<string> vListaNrConsulta = new List<string>();
-                    List<string> vListaCpf = new List<string>();
-                    List<string> vListaDi = new List<string>();
-
-                    if (TipoExtratoSelecionado == TipoExtrato.DI)
-                    {
-                        if (TipoConsultaExtratoSelecionado == TipoConsultaExtrato.NumeroDeclaracao)
+                        if (cbxBancoDados.Checked)
                         {
-                            if (cbxBancoDados.Checked)
+                            foreach (var row in db.tsiscomexweb_robo.Where(reg => reg.tp_consulta == "DI" && reg.in_rodando == 1 && reg.in_desembaraco == 0))
                             {
-                                foreach (var row in db.tsiscomexweb_robo.Where(reg => reg.tp_consulta == "DI" && reg.in_rodando == 1 && reg.in_desembaraco == 0))
-                                {
-                                    row.in_rodando = 0;
+                                row.in_rodando = 0;
 
-                                    if (row.tp_acao == "consulta" || (row.tp_acao == "acompanha" && row.dt_agendamento <= DateTime.Now))
+                                if (row.tp_acao == "consulta" || (row.tp_acao == "acompanha" && row.dt_agendamento <= DateTime.Now))
+                                {
+                                    vListaNrConsulta.Add(row.nr_registro.ToString().Trim() + "; " + row.cpf_certificado.ToString().Trim());
+
+                                    if (!vListaCpf.Contains(row.cpf_certificado.ToString().Trim()))
                                     {
-                                        vListaNrConsulta.Add(row.nr_registro.ToString().Trim() + "; " + row.cpf_certificado.ToString().Trim());
-
-                                        if (!vListaCpf.Contains(row.cpf_certificado.ToString().Trim()))
-                                        {
-                                            vListaCpf.Add(row.cpf_certificado.ToString().Trim());
-                                        }
-                                        
-                                    }                                    
-                                }
-                                db.SaveChanges();
-                            }
-                            else
-                            {
-                                if (!string.IsNullOrEmpty(edtNrConsultaDI.Text.Trim()))
-                                {
-
-                                    vListaNrConsulta.Add(edtNrConsultaDI.Text.Trim());
-
-                                }
-
-                                if (dgvNrDelacaracao.Rows.Count > 0)
-                                {
-                                    foreach (DataGridViewRow numero in dgvNrDelacaracao.Rows)
-                                    {
-                                        vListaNrConsulta.Add(numero.Cells[0].Value.ToString());
+                                        vListaCpf.Add(row.cpf_certificado.ToString().Trim());
                                     }
+
                                 }
                             }
-
-                        }
-                        if (vListaCpf.Count() > 0)
-                        {
-                            var store = new X509Store(StoreLocation.CurrentUser);
-                            store.Open(OpenFlags.ReadOnly);
-                            var certificados = store.Certificates.OfType<X509Certificate2>().Where(x => x.Issuer.Contains("Secretaria da Receita Federal do Brasil")).OrderBy(x => x.Subject);
-
-                            int qtdSetas = 0;
-                            foreach (string cpf in vListaCpf)
-                            {
-                                int i = 0;
-                                foreach (var certificado in certificados)
-                                {
-                                    if (certificado.FriendlyName.Contains(cpf))
-                                    {
-                                        qtdSetas = i++;
-
-                                    }
-                                    i++;
-                                }
-
-                                Thread tSeta = new Thread(() => _extratoService.SetarCertificado(qtdSetas));
-                                tSeta.Start();
-                                _extratoService.AbrirBrowser();
-                                _extratoService.NavegarURLExtratoDeclaracaoDI();
-                                Thread.Sleep(2000);
-                                foreach (string di in vListaNrConsulta)
-                                {
-                                    if (cpf == di.ToString().Split(';')[1].Trim())
-                                    {
-                                        vListaDi.Add(di.ToString().Split(';')[0]);
-                                    }
-                                }
-                                Periodo periodo = PeriodoSelecionado;
-                                Thread t = new Thread(() => _extratoService.ConsultarDI(periodo, TipoConsultaExtratoSelecionado, vListaDi, dtpInicial.Value, dtpFinal.Value));
-                                t.Start();
-                            }
+                            db.SaveChanges();
                         }
                         else
                         {
-                            FinalizarOperacao();
-                        }
-
-
-
-                    }
-
-                    if (TipoExtratoSelecionado == TipoExtrato.LI)
-                    {
-
-                        if (TipoConsultaExtratoSelecionado == TipoConsultaExtrato.NumeroDeclaracao)
-                        {
-                            if (cbxBancoDados.Checked)
-                            {
-                                var selecaoLI = db.tsiscomexweb_robo.Where(reg => reg.tp_consulta == "LI" && reg.in_rodando == 1).OrderBy(reg => reg.nr_registro);
-
-                                foreach (var row in selecaoLI)
-                                {
-                                    if (row.tp_acao == "consulta" || (row.tp_acao == "acompanha" && row.dt_agendamento <= DateTime.Now))
-                                    {
-                                        vListaNrConsulta.Add(row.nr_registro.ToString().Trim() + "; " + row.cpf_certificado.ToString().Trim());
-
-                                        if (!vListaCpf.Contains(row.cpf_certificado.ToString().Trim()))
-                                        {
-                                            vListaCpf.Add(row.cpf_certificado.ToString().Trim());
-                                        }
-
-                                    }
-                                }
-
-                            }
-
                             if (!string.IsNullOrEmpty(edtNrConsultaDI.Text.Trim()))
                             {
+
                                 vListaNrConsulta.Add(edtNrConsultaDI.Text.Trim());
+
                             }
 
                             if (dgvNrDelacaracao.Rows.Count > 0)
@@ -401,67 +256,154 @@ namespace AutoEcac
                                 }
                             }
                         }
-                        else
+
+                    }
+                    if (vListaCpf.Count() > 0)
+                    {
+                        var store = new X509Store(StoreLocation.CurrentUser);
+                        store.Open(OpenFlags.ReadOnly);
+                        var certificados = store.Certificates.OfType<X509Certificate2>().Where(x => x.Issuer.Contains("Secretaria da Receita Federal do Brasil")).OrderBy(x => x.Subject);
+
+                        int qtdSetas = 0;
+                        foreach (string cpf in vListaCpf)
+                        {
+                            int i = 0;
+                            foreach (var certificado in certificados)
+                            {
+                                if (certificado.FriendlyName.Contains(cpf))
+                                {
+                                    qtdSetas = i++;
+
+                                }
+                                i++;
+                            }
+
+                            Thread tSeta = new Thread(() => _extratoService.SetarCertificado(qtdSetas));
+                            tSeta.Start();
+                            _extratoService.AbrirBrowser();
+                            _extratoService.NavegarURLExtratoDeclaracaoDI();
+                            Thread.Sleep(2000);
+                            foreach (string di in vListaNrConsulta)
+                            {
+                                if (cpf == di.ToString().Split(';')[1].Trim())
+                                {
+                                    vListaDi.Add(di.ToString().Split(';')[0]);
+                                }
+                            }
+                            Periodo periodo = PeriodoSelecionado;
+                            Thread t = new Thread(() => _extratoService.ConsultarDI(periodo, TipoConsultaExtratoSelecionado, vListaDi, dtpInicial.Value, dtpFinal.Value));
+                            t.Start();
+                        }
+                    }
+                    else
+                    {
+                        FinalizarOperacao();
+                    }
+
+
+
+                }
+
+                if (TipoExtratoSelecionado == TipoExtrato.LI)
+                {                    
+                    if (TipoConsultaExtratoSelecionado == TipoConsultaExtrato.NumeroDeclaracao)
+                    {
+                        if (cbxBancoDados.Checked)
+                        {
+                            var selecaoLI = db.tsiscomexweb_robo.Where(reg => reg.tp_consulta == "LI" && reg.in_rodando == 1).OrderBy(reg => reg.nr_registro);
+
+                            foreach (var row in selecaoLI)
+                            {
+                                if (row.tp_acao == "consulta" || (row.tp_acao == "acompanha" && row.dt_agendamento <= DateTime.Now))
+                                {
+                                    row.in_rodando = 0;
+                                    vListaNrConsulta.Add(row.nr_registro.ToString().Trim() + "; " + row.cpf_certificado.ToString().Trim());
+
+                                    if (!vListaCpf.Contains(row.cpf_certificado.ToString().Trim()))
+                                    {
+                                        vListaCpf.Add(row.cpf_certificado.ToString().Trim());
+                                    }
+
+                                }
+                            }
+                            db.SaveChanges();
+
+                        }
+
+                        if (!string.IsNullOrEmpty(edtNrConsultaDI.Text.Trim()))
                         {
                             vListaNrConsulta.Add(edtNrConsultaDI.Text.Trim());
                         }
-                        if (vListaCpf.Count() > 0)
+
+                        if (dgvNrDelacaracao.Rows.Count > 0)
                         {
-
-                            var store = new X509Store(StoreLocation.CurrentUser);
-                            store.Open(OpenFlags.ReadOnly);
-                            var certificados = store.Certificates.OfType<X509Certificate2>().Where(x => x.Issuer.Contains("Secretaria da Receita Federal do Brasil")).OrderBy(x => x.Subject);
-
-                            int qtdSetas = 0;
-
-                            foreach (string cpf in vListaCpf)
+                            foreach (DataGridViewRow numero in dgvNrDelacaracao.Rows)
                             {
-                                int i = 0;
-                                foreach (var certificado in certificados)
-                                {
-                                    if (certificado.FriendlyName.Contains(cpf))
-                                    {
-                                        qtdSetas = i++;
-
-                                    }
-                                    i++;
-                                }
-
-                                Thread tSeta = new Thread(() => _extratoService.SetarCertificado(qtdSetas));
-                                tSeta.Start();
-                                _extratoService.AbrirBrowser();
-                                _extratoService.NavegarURLExtratoDeclaracaoLI();
-                                Thread.Sleep(2000);
-                                foreach (string di in vListaNrConsulta)
-                                {
-                                    if (cpf == di.ToString().Split(';')[1].Trim())
-                                    {
-                                        vListaDi.Add(di.ToString().Split(';')[0]);
-                                    }
-                                }
-                                Periodo periodo = PeriodoSelecionado;
-                                Thread t = new Thread(() => _extratoService.ConsultarLI(periodo, TipoConsultaExtratoSelecionado, vListaDi, dtpInicial.Value, dtpFinal.Value));
-                                t.Start();
+                                vListaNrConsulta.Add(numero.Cells[0].Value.ToString());
                             }
                         }
-                        else
-                        {
-                            FinalizarOperacao();
-                        }
-
                     }
-                }
+                    else
+                    {
+                        vListaNrConsulta.Add(edtNrConsultaDI.Text.Trim());
+                    }
+                    if (vListaCpf.Count() > 0)
+                    {
 
-                Thread.Sleep(2000);                
+                        var store = new X509Store(StoreLocation.CurrentUser);
+                        store.Open(OpenFlags.ReadOnly);
+                        var certificados = store.Certificates.OfType<X509Certificate2>().Where(x => x.Issuer.Contains("Secretaria da Receita Federal do Brasil")).OrderBy(x => x.Subject);
 
-                dgvNrDelacaracao.Rows.Clear();
+                        int qtdSetas = 0;
 
-                if (!cbxBancoDados.Checked)
-                {
-                    MessageBox.Show("Consulta realizada com sucesso!", "Auto-Ecac", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        foreach (string cpf in vListaCpf)
+                        {
+                            int i = 0;
+                            foreach (var certificado in certificados)
+                            {
+                                if (certificado.FriendlyName.Contains(cpf))
+                                {
+                                    qtdSetas = i++;
+
+                                }
+                                i++;
+                            }
+
+                            Thread tSeta = new Thread(() => _extratoService.SetarCertificado(qtdSetas));
+                            tSeta.Start();
+                            _extratoService.AbrirBrowser();
+                            _extratoService.NavegarURLExtratoDeclaracaoLI();
+                            Thread.Sleep(2000);
+                            foreach (string di in vListaNrConsulta)
+                            {
+                                if (cpf == di.ToString().Split(';')[1].Trim())
+                                {
+                                    vListaDi.Add(di.ToString().Split(';')[0]);
+                                }
+                            }
+                            Periodo periodo = PeriodoSelecionado;
+                            Thread t = new Thread(() => _extratoService.ConsultarLI(periodo, TipoConsultaExtratoSelecionado, vListaDi, dtpInicial.Value, dtpFinal.Value));
+                            t.Start();
+                        }
+                    }
+                    else
+                    {
+                        FinalizarOperacao();
+                    }
+
                 }
             }
-            
+
+            Thread.Sleep(2000);
+
+            dgvNrDelacaracao.Rows.Clear();
+
+            if (!cbxBancoDados.Checked)
+            {
+                MessageBox.Show("Consulta realizada com sucesso!", "Auto-Ecac", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            //}
+
         }
 
 
@@ -510,6 +452,7 @@ namespace AutoEcac
 
         private void btnFechar_Click(object sender, EventArgs e)
         {
+            Application.Exit();
             this.Close();
         }
 
@@ -654,8 +597,19 @@ namespace AutoEcac
 
         private void btnServico_Click(object sender, EventArgs e)
         {
-            tempoDI.Enabled = true;
-            //tempoLI.Enabled = true;
+            if (rbConsultaLI.Checked)
+            {
+                tempoLI.Enabled = true;
+                tempoLI.Interval = rdbMinutos.Checked ? (int)TimeSpan.FromMinutes(Convert.ToInt32(numericUpDown1.Value)).TotalMilliseconds : (int)TimeSpan.FromHours(Convert.ToInt32(numericUpDown1.Value)).TotalMilliseconds;
+                tempoLI_Tick(sender, null);
+
+            }
+            else
+            {
+                tempoDI.Enabled = true;
+                tempoDI.Interval = rdbMinutos.Checked ? (int)TimeSpan.FromMinutes(Convert.ToInt32(numericUpDown1.Value)).TotalMilliseconds : (int)TimeSpan.FromHours(Convert.ToInt32(numericUpDown1.Value)).TotalMilliseconds;
+                tempoDI_Tick(sender, null);
+            }
 
         }
 

@@ -15,7 +15,7 @@ namespace AutoEcac
     {
 
 		private HttpClient client = new HttpClient();
-		private string urlBase = "https://kestraa-upload-qa.azurewebsites.net/upload/Shipments/";
+		private readonly string urlBase = "https://kestraa-upload-qa.azurewebsites.net/upload/Shipments/";
 
 		// instanciar a classe para chamar o servico
 		//kestraaUpload enviarAquivo = new kestraaUpload();
