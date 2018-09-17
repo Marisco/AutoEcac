@@ -54,22 +54,26 @@
             this.label1 = new System.Windows.Forms.Label();
             this.edtNrConsultaDI = new System.Windows.Forms.TextBox();
             this.panel3 = new System.Windows.Forms.Panel();
-            this.panel4 = new System.Windows.Forms.Panel();
             this.panel1 = new System.Windows.Forms.Panel();
             this.rbConsultaDI = new System.Windows.Forms.RadioButton();
             this.rbConsultaLI = new System.Windows.Forms.RadioButton();
             this.gbExtrato = new System.Windows.Forms.GroupBox();
-            this.cbxBancoDados = new System.Windows.Forms.CheckBox();
             this.btnServico = new System.Windows.Forms.Button();
             this.tempoDI = new System.Windows.Forms.Timer(this.components);
             this.tempoLI = new System.Windows.Forms.Timer(this.components);
+            this.grbTempo = new System.Windows.Forms.GroupBox();
+            this.rdbHora = new System.Windows.Forms.RadioButton();
+            this.rdbMinutos = new System.Windows.Forms.RadioButton();
+            this.numericUpDown1 = new System.Windows.Forms.NumericUpDown();
+            this.cbxBancoDados = new System.Windows.Forms.CheckBox();
             this.grpDatas.SuspendLayout();
             this.grpServicos.SuspendLayout();
             this.grpPerfil.SuspendLayout();
             this.grbDI.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvNrDelacaracao)).BeginInit();
-            this.panel3.SuspendLayout();
             this.gbExtrato.SuspendLayout();
+            this.grbTempo.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
             this.SuspendLayout();
             // 
             // btnOk
@@ -78,7 +82,7 @@
             this.btnOk.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnOk.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnOk.ForeColor = System.Drawing.Color.White;
-            this.btnOk.Location = new System.Drawing.Point(179, 555);
+            this.btnOk.Location = new System.Drawing.Point(689, 385);
             this.btnOk.Name = "btnOk";
             this.btnOk.Size = new System.Drawing.Size(75, 23);
             this.btnOk.TabIndex = 3;
@@ -93,7 +97,7 @@
             this.grpDatas.Controls.Add(this.lblDtInicial);
             this.grpDatas.Controls.Add(this.dtpFinal);
             this.grpDatas.Controls.Add(this.dtpInicial);
-            this.grpDatas.Location = new System.Drawing.Point(10, 448);
+            this.grpDatas.Location = new System.Drawing.Point(512, 279);
             this.grpDatas.Name = "grpDatas";
             this.grpDatas.Size = new System.Drawing.Size(252, 100);
             this.grpDatas.TabIndex = 14;
@@ -155,7 +159,7 @@
             // grpServicos
             // 
             this.grpServicos.Controls.Add(this.cbxServico);
-            this.grpServicos.Location = new System.Drawing.Point(9, 85);
+            this.grpServicos.Location = new System.Drawing.Point(518, 414);
             this.grpServicos.Name = "grpServicos";
             this.grpServicos.Size = new System.Drawing.Size(252, 55);
             this.grpServicos.TabIndex = 17;
@@ -182,7 +186,7 @@
             this.grpPerfil.BackColor = System.Drawing.Color.White;
             this.grpPerfil.Controls.Add(this.lblCnpj);
             this.grpPerfil.Controls.Add(this.edtCNPJ);
-            this.grpPerfil.Location = new System.Drawing.Point(9, 146);
+            this.grpPerfil.Location = new System.Drawing.Point(512, 12);
             this.grpPerfil.Name = "grpPerfil";
             this.grpPerfil.Size = new System.Drawing.Size(252, 55);
             this.grpPerfil.TabIndex = 18;
@@ -212,7 +216,7 @@
             this.btnFechar.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnFechar.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnFechar.ForeColor = System.Drawing.Color.White;
-            this.btnFechar.Location = new System.Drawing.Point(15, 555);
+            this.btnFechar.Location = new System.Drawing.Point(5, 185);
             this.btnFechar.Name = "btnFechar";
             this.btnFechar.Size = new System.Drawing.Size(75, 23);
             this.btnFechar.TabIndex = 19;
@@ -230,7 +234,7 @@
             this.grbDI.Controls.Add(this.rdbNrDeclaracao);
             this.grbDI.Controls.Add(this.label1);
             this.grbDI.Controls.Add(this.edtNrConsultaDI);
-            this.grbDI.Location = new System.Drawing.Point(9, 242);
+            this.grbDI.Location = new System.Drawing.Point(512, 73);
             this.grbDI.Name = "grbDI";
             this.grbDI.Size = new System.Drawing.Size(252, 200);
             this.grbDI.TabIndex = 22;
@@ -339,29 +343,18 @@
             this.panel3.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("panel3.BackgroundImage")));
             this.panel3.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
             this.panel3.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.panel3.Controls.Add(this.panel4);
-            this.panel3.Location = new System.Drawing.Point(143, 6);
+            this.panel3.Location = new System.Drawing.Point(5, 6);
             this.panel3.Name = "panel3";
-            this.panel3.Size = new System.Drawing.Size(118, 73);
+            this.panel3.Size = new System.Drawing.Size(185, 62);
             this.panel3.TabIndex = 21;
             this.panel3.MouseClick += new System.Windows.Forms.MouseEventHandler(this.panel3_MouseClick);
-            // 
-            // panel4
-            // 
-            this.panel4.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("panel4.BackgroundImage")));
-            this.panel4.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
-            this.panel4.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.panel4.Location = new System.Drawing.Point(123, 2);
-            this.panel4.Name = "panel4";
-            this.panel4.Size = new System.Drawing.Size(128, 73);
-            this.panel4.TabIndex = 21;
             // 
             // panel1
             // 
             this.panel1.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("panel1.BackgroundImage")));
             this.panel1.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
             this.panel1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.panel1.Location = new System.Drawing.Point(9, 6);
+            this.panel1.Location = new System.Drawing.Point(357, 12);
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(128, 73);
             this.panel1.TabIndex = 20;
@@ -371,7 +364,7 @@
             // 
             this.rbConsultaDI.AutoSize = true;
             this.rbConsultaDI.Checked = true;
-            this.rbConsultaDI.Location = new System.Drawing.Point(10, 20);
+            this.rbConsultaDI.Location = new System.Drawing.Point(9, 20);
             this.rbConsultaDI.Margin = new System.Windows.Forms.Padding(2);
             this.rbConsultaDI.Name = "rbConsultaDI";
             this.rbConsultaDI.Size = new System.Drawing.Size(36, 17);
@@ -383,7 +376,7 @@
             // rbConsultaLI
             // 
             this.rbConsultaLI.AutoSize = true;
-            this.rbConsultaLI.Location = new System.Drawing.Point(64, 20);
+            this.rbConsultaLI.Location = new System.Drawing.Point(66, 20);
             this.rbConsultaLI.Margin = new System.Windows.Forms.Padding(2);
             this.rbConsultaLI.Name = "rbConsultaLI";
             this.rbConsultaLI.Size = new System.Drawing.Size(34, 17);
@@ -393,63 +386,115 @@
             // 
             // gbExtrato
             // 
-            this.gbExtrato.Controls.Add(this.cbxBancoDados);
             this.gbExtrato.Controls.Add(this.rbConsultaDI);
             this.gbExtrato.Controls.Add(this.rbConsultaLI);
-            this.gbExtrato.Location = new System.Drawing.Point(9, 202);
+            this.gbExtrato.Location = new System.Drawing.Point(5, 73);
             this.gbExtrato.Margin = new System.Windows.Forms.Padding(2);
             this.gbExtrato.Name = "gbExtrato";
             this.gbExtrato.Padding = new System.Windows.Forms.Padding(2);
-            this.gbExtrato.Size = new System.Drawing.Size(252, 42);
+            this.gbExtrato.Size = new System.Drawing.Size(185, 42);
             this.gbExtrato.TabIndex = 25;
             this.gbExtrato.TabStop = false;
-            this.gbExtrato.Text = "Extrato :: Tipo de Consulta";
-            // 
-            // cbxBancoDados
-            // 
-            this.cbxBancoDados.AutoSize = true;
-            this.cbxBancoDados.ForeColor = System.Drawing.Color.Red;
-            this.cbxBancoDados.Location = new System.Drawing.Point(117, 20);
-            this.cbxBancoDados.Margin = new System.Windows.Forms.Padding(2);
-            this.cbxBancoDados.Name = "cbxBancoDados";
-            this.cbxBancoDados.Size = new System.Drawing.Size(106, 17);
-            this.cbxBancoDados.TabIndex = 25;
-            this.cbxBancoDados.Text = "Banco de Dados";
-            this.cbxBancoDados.UseVisualStyleBackColor = true;
-            this.cbxBancoDados.Click += new System.EventHandler(this.cbxBancoDados_Click);
+            this.gbExtrato.Text = "Tipo de Consulta:";
             // 
             // btnServico
             // 
-            this.btnServico.BackColor = System.Drawing.Color.Chocolate;
+            this.btnServico.BackColor = System.Drawing.Color.Green;
             this.btnServico.DialogResult = System.Windows.Forms.DialogResult.Cancel;
             this.btnServico.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnServico.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnServico.ForeColor = System.Drawing.Color.White;
-            this.btnServico.Location = new System.Drawing.Point(96, 555);
+            this.btnServico.Location = new System.Drawing.Point(115, 185);
             this.btnServico.Name = "btnServico";
             this.btnServico.Size = new System.Drawing.Size(75, 23);
             this.btnServico.TabIndex = 26;
-            this.btnServico.Text = "Serviço";
+            this.btnServico.Text = "OK";
             this.btnServico.UseVisualStyleBackColor = false;
             this.btnServico.Click += new System.EventHandler(this.btnServico_Click);
             // 
             // tempoDI
             // 
-            this.tempoDI.Enabled = true;
             this.tempoDI.Interval = 30000;
             this.tempoDI.Tick += new System.EventHandler(this.tempoDI_Tick);
             // 
             // tempoLI
             // 
-            this.tempoLI.Interval = 60000;
+            this.tempoLI.Interval = 30000;
             this.tempoLI.Tick += new System.EventHandler(this.tempoLI_Tick);
+            // 
+            // grbTempo
+            // 
+            this.grbTempo.Controls.Add(this.rdbHora);
+            this.grbTempo.Controls.Add(this.rdbMinutos);
+            this.grbTempo.Controls.Add(this.numericUpDown1);
+            this.grbTempo.Location = new System.Drawing.Point(5, 119);
+            this.grbTempo.Margin = new System.Windows.Forms.Padding(2);
+            this.grbTempo.Name = "grbTempo";
+            this.grbTempo.Padding = new System.Windows.Forms.Padding(2);
+            this.grbTempo.Size = new System.Drawing.Size(185, 61);
+            this.grbTempo.TabIndex = 27;
+            this.grbTempo.TabStop = false;
+            this.grbTempo.Text = "Tempo de Consulta:";
+            // 
+            // rdbHora
+            // 
+            this.rdbHora.AutoSize = true;
+            this.rdbHora.Location = new System.Drawing.Point(9, 25);
+            this.rdbHora.Margin = new System.Windows.Forms.Padding(2);
+            this.rdbHora.Name = "rdbHora";
+            this.rdbHora.Size = new System.Drawing.Size(53, 17);
+            this.rdbHora.TabIndex = 25;
+            this.rdbHora.Text = "Horas";
+            this.rdbHora.UseVisualStyleBackColor = true;
+            // 
+            // rdbMinutos
+            // 
+            this.rdbMinutos.AutoSize = true;
+            this.rdbMinutos.Checked = true;
+            this.rdbMinutos.Location = new System.Drawing.Point(66, 25);
+            this.rdbMinutos.Margin = new System.Windows.Forms.Padding(2);
+            this.rdbMinutos.Name = "rdbMinutos";
+            this.rdbMinutos.Size = new System.Drawing.Size(62, 17);
+            this.rdbMinutos.TabIndex = 26;
+            this.rdbMinutos.TabStop = true;
+            this.rdbMinutos.Text = "Minutos";
+            this.rdbMinutos.UseVisualStyleBackColor = true;
+            // 
+            // numericUpDown1
+            // 
+            this.numericUpDown1.Location = new System.Drawing.Point(133, 25);
+            this.numericUpDown1.Name = "numericUpDown1";
+            this.numericUpDown1.Size = new System.Drawing.Size(36, 20);
+            this.numericUpDown1.TabIndex = 0;
+            this.numericUpDown1.Value = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            // 
+            // cbxBancoDados
+            // 
+            this.cbxBancoDados.AutoSize = true;
+            this.cbxBancoDados.Checked = true;
+            this.cbxBancoDados.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.cbxBancoDados.ForeColor = System.Drawing.Color.Red;
+            this.cbxBancoDados.Location = new System.Drawing.Point(769, 12);
+            this.cbxBancoDados.Margin = new System.Windows.Forms.Padding(2);
+            this.cbxBancoDados.Name = "cbxBancoDados";
+            this.cbxBancoDados.Size = new System.Drawing.Size(106, 17);
+            this.cbxBancoDados.TabIndex = 28;
+            this.cbxBancoDados.Text = "Banco de Dados";
+            this.cbxBancoDados.UseVisualStyleBackColor = true;
+            this.cbxBancoDados.Visible = false;
             // 
             // frmAutoEcac
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
-            this.ClientSize = new System.Drawing.Size(270, 601);
+            this.ClientSize = new System.Drawing.Size(198, 216);
+            this.Controls.Add(this.cbxBancoDados);
+            this.Controls.Add(this.grbTempo);
             this.Controls.Add(this.btnServico);
             this.Controls.Add(this.gbExtrato);
             this.Controls.Add(this.grbDI);
@@ -474,10 +519,13 @@
             this.grbDI.ResumeLayout(false);
             this.grbDI.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvNrDelacaracao)).EndInit();
-            this.panel3.ResumeLayout(false);
             this.gbExtrato.ResumeLayout(false);
             this.gbExtrato.PerformLayout();
+            this.grbTempo.ResumeLayout(false);
+            this.grbTempo.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).EndInit();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -497,7 +545,6 @@
         private System.Windows.Forms.Button btnFechar;
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.Panel panel3;
-        private System.Windows.Forms.Panel panel4;
         private System.Windows.Forms.GroupBox grbDI;
         private System.Windows.Forms.DataGridView dgvNrDelacaracao;
         private System.Windows.Forms.DataGridViewTextBoxColumn nrDeclaracao;
@@ -511,10 +558,14 @@
         private System.Windows.Forms.GroupBox gbExtrato;
         private System.Windows.Forms.RadioButton rbConsultaDI;
         private System.Windows.Forms.RadioButton rbConsultaLI;
-		private System.Windows.Forms.CheckBox cbxBancoDados;
 		private System.Windows.Forms.Button btnServico;
 		private System.Windows.Forms.Timer tempoDI;
         private System.Windows.Forms.Timer tempoLI;
+        private System.Windows.Forms.GroupBox grbTempo;
+        private System.Windows.Forms.RadioButton rdbHora;
+        private System.Windows.Forms.RadioButton rdbMinutos;
+        private System.Windows.Forms.NumericUpDown numericUpDown1;
+        private System.Windows.Forms.CheckBox cbxBancoDados;
     }
 }
 

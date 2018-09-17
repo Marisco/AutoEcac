@@ -30,6 +30,10 @@ namespace AutoEcac.Servicos
             _kestraaUpload = new KestraaUpload();
         }
 
+        public ExtratoService()
+        {
+        }
+
         public void NavegarURLExtratoDeclaracaoDI()
         {
             _browser.Navigate().GoToUrl(URL_EXTRATO_DECLARACAO_DI);
@@ -185,10 +189,13 @@ namespace AutoEcac.Servicos
                 foreach (DateTime data in LoopNoPeriodo(pDtInicial, pDtFinal))
                 {
 
-                    Thread.Sleep(1000);
+                    Thread.Sleep(2000);
 
                     foreach (string numero in pNrConsulta)
                     {
+                        int numeroLi = int.Parse(numero);
+                        tsiscomexweb_robo registro = _db.tsiscomexweb_robo.Where(reg => reg.nr_registro == numeroLi).First();
+                        Thread.Sleep(2000);
                         base._consultaAtual = numero;
 
                         switch ((int)pTipoConsultaExtrato)
@@ -242,9 +249,7 @@ namespace AutoEcac.Servicos
 
                         try
                         {
-                            int numeroLi = int.Parse(numero);
-                            tsiscomexweb_robo registro = _db.tsiscomexweb_robo.Where(reg => reg.nr_registro == numeroLi).First();
-                            Thread.Sleep(2000);
+
 
                             _browser.FindElement(By.Id("imprimir")).Click();
                             Thread.Sleep(2000);
@@ -305,13 +310,15 @@ namespace AutoEcac.Servicos
                             Thread.Sleep(1000);
 
                             AtualizarLI(this.DiretorioCompleto + "\\" + _NmArquivoNovo, ref registro);
-
                             _db.SaveChanges();
 
                         }
                         catch (Exception e)
                         {
-                            LogarErros(DateTime.Now.ToString() + " Erro: Consulta Atual: " + _consultaAtual + " Consulta Anterior: " + _consultaAnterior + " Msg: " + e.Message);
+                            string msg = DateTime.Now.ToString() + " Erro: Consulta Atual: " + _consultaAtual + " Consulta Anterior: " + _consultaAnterior + " Msg: " + e.Message;
+                            registro.tx_erro = msg;
+                            _db.SaveChanges();
+                            LogarErros(msg);
                             Thread.Sleep(1000);
                             try
                             {
@@ -320,8 +327,10 @@ namespace AutoEcac.Servicos
                             }
                             catch (Exception)
                             {
-
-                                LogarErros(DateTime.Now.ToString() +" Erro: Consulta Atual: " + _consultaAtual + " Consulta Anterior: " + _consultaAnterior + " Msg: " + e.Message);
+                                msg = DateTime.Now.ToString() + " Erro: Consulta Atual: " + _consultaAtual + " Consulta Anterior: " + _consultaAnterior + " Msg: " + e.Message;
+                                registro.tx_erro = msg;
+                                _db.SaveChanges();
+                                LogarErros(msg);
                             }
                         }
 
@@ -334,6 +343,7 @@ namespace AutoEcac.Servicos
             }
             catch (Exception e)
             {
+
                 LogarErros(DateTime.Now.ToString() + " Consulta Antual: " + _consultaAtual + " Consulta Anterior: " + _consultaAnterior + "Msg: " + e.Message);
 
             }
@@ -405,6 +415,8 @@ namespace AutoEcac.Servicos
                     foreach (string numero in pNrConsulta)
                     {
                         base._consultaAtual = numero;
+                        int nrRegistroDi = Int32.Parse(numero);
+                        tsiscomexweb_robo registro = _db.tsiscomexweb_robo.OrderByDescending(reg => reg.nr_sequencia).Where(reg => reg.nr_registro == nrRegistroDi).First();
 
                         switch ((int)pTipoConsultaExtrato)
                         {
@@ -449,8 +461,6 @@ namespace AutoEcac.Servicos
                             Thread.Sleep(2000);
                             ConsultarDI(pPeriodo, 0, vListaDI, DateTime.Now, DateTime.Now);
                         }
-                        int nrRegistroDi = Int32.Parse(numero);
-                        tsiscomexweb_robo registro = _db.tsiscomexweb_robo.OrderByDescending(reg => reg.nr_sequencia).Where(reg => reg.nr_registro == nrRegistroDi).First();
 
 
                         try
@@ -523,8 +533,13 @@ namespace AutoEcac.Servicos
                             NavegarURLExtratoDeclaracaoDI();
 
                         }
-                        catch (Exception)
-                        {
+                        catch (Exception e)
+                        {                            
+                            string msg = DateTime.Now.ToString() + " Consulta Antual: " + _consultaAtual + " Consulta Anterior: " + _consultaAnterior + "Msg: " + e.Message;
+                            registro.tx_erro = msg;
+                            _db.SaveChanges();
+                            LogarErros(msg);
+
                             Thread.Sleep(1000);
                             try
                             {
@@ -911,21 +926,21 @@ namespace AutoEcac.Servicos
             {
                 _browser.Navigate().GoToUrl(URL_EXTRATO_LOGIN);
                 _browser.FindElement(By.XPath("//img[contains(@src,'certificado')]")).Click();
-                
-            }
-            catch (Exception e)
-            {                
-                LogarErros(DateTime.Now.ToString() + " Erro no login a tela não estava em foco ou demorou muito para carregar Msg:" + e.Message);                
 
             }
-            
+            catch (Exception e)
+            {
+                LogarErros(DateTime.Now.ToString() + " Erro no login a tela não estava em foco ou demorou muito para carregar Msg:" + e.Message);
+
+            }
+
 
         }
 
         public void SetarCertificado(int qtdSetas)
         {
             Thread.Sleep(30000);
-            for(int i =0; i<= qtdSetas; i++)
+            for (int i = 0; i <= qtdSetas; i++)
             {
                 System.Windows.Forms.SendKeys.SendWait(@"{DOWN}");
             }
