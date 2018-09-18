@@ -24,7 +24,6 @@ using System.Text;
 using System.IO;
 using AutoEcac.model;
 using System.Globalization;
-using DevExpress.XtraScheduler;
 using System.Drawing;
 
 namespace AutoEcac
