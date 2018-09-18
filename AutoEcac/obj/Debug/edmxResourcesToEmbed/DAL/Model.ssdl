@@ -5,7 +5,7 @@
       <PropertyRef Name="nr_sequencia" />
     </Key>
     <Property Name="nr_sequencia" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-    <Property Name="nr_processo" Type="varchar" MaxLength="50" />
+    <Property Name="nr_processo" Type="bigint" />
     <Property Name="nr_registro" Type="int" />
     <Property Name="nr_seq" Type="int" />
     <Property Name="tp_consulta" Type="varchar" MaxLength="2" Nullable="false" />
@@ -19,7 +19,7 @@
     <Property Name="cpf_certificado" Type="varchar" MaxLength="11" Nullable="false" />
     <Property Name="in_rodando" Type="int" Nullable="false" />
     <Property Name="in_desembaraco" Type="int" />
-    <Property Name="tp_anuencia" Type="varchar" MaxLength="45" />
+    <Property Name="tp_anuencia" Type="varchar" MaxLength="256" />
     <Property Name="in_situacao" Type="int" />
     <Property Name="xml_comando" Type="text" />
     <Property Name="xml_retorno" Type="text" />

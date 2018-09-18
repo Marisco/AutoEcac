@@ -602,7 +602,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
-            this.ClientSize = new System.Drawing.Size(182, 402);
+            this.ClientSize = new System.Drawing.Size(182, 391);
             this.Controls.Add(this.grbPeriodocidadeLI);
             this.Controls.Add(this.cbxBancoDados);
             this.Controls.Add(this.grbTempo);

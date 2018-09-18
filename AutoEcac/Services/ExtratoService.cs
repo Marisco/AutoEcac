@@ -653,7 +653,7 @@ namespace AutoEcac.Servicos
                                 DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss"),
                                 "99999999");
 
-                            _kestraaUpload.enviarArquivosws(uploadRequest, registro.nr_processo);
+                            _kestraaUpload.enviarArquivosws(uploadRequest, registro.nr_registro);
 
                             _browser.FindElement(By.Id("btnRegistrarDI")).Click();
                             Thread.Sleep(2000);

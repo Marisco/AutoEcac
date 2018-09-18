@@ -5,7 +5,7 @@
       <PropertyRef Name="nr_sequencia" />
     </Key>
     <Property Name="nr_sequencia" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-    <Property Name="nr_processo" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Name="nr_processo" Type="Int64" />
     <Property Name="nr_registro" Type="Int32" />
     <Property Name="nr_seq" Type="Int32" />
     <Property Name="tp_consulta" Type="String" MaxLength="2" FixedLength="false" Unicode="false" Nullable="false" />

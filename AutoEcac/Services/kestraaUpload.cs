@@ -39,7 +39,7 @@ namespace AutoEcac
 		//userId:99999999
 
 
-		public async void enviarArquivosws(KestraaUploadRequest requestData, String nrProcesso)
+		public async void enviarArquivosws(KestraaUploadRequest requestData, Int64 ?nrProcesso)
         {
 
 			try

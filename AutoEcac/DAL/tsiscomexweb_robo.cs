@@ -15,7 +15,7 @@ namespace AutoEcac.DAL
     public partial class tsiscomexweb_robo
     {
         public int nr_sequencia { get; set; }
-        public string nr_processo { get; set; }
+        public Nullable<long> nr_processo { get; set; }
         public Nullable<int> nr_registro { get; set; }
         public Nullable<int> nr_seq { get; set; }
         public string tp_consulta { get; set; }
