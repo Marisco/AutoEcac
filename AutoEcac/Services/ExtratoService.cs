@@ -56,6 +56,7 @@ namespace AutoEcac.Servicos
             XmlNamespaceManager nsMgr = new XmlNamespaceManager(xmlLiCompleta.NameTable);
             nsMgr.AddNamespace("li", "http://www.serpro.gov.br/liweb/schema/ResultadoConsultaLoteLiWeb.html");
             XmlNode listaAnuencias = xmlLiCompleta.SelectSingleNode("/li:resposta-consulta-li/li:lista-li-completa/li:li-completa/li:Grupo-LI-Anuencias/li:lista-anuencias", nsMgr);
+
             foreach (XmlNode anuencia in listaAnuencias)
             {
                 foreach (XmlNode atributo in anuencia.ChildNodes)
@@ -141,9 +142,9 @@ namespace AutoEcac.Servicos
             string OrgaoAnuenteAtual = orgaoAnuente;
 
             pRegistro.tp_anuencia = OrgaoAnuenteAtual;
-            pRegistro.in_rodando = pRegistro.tp_acao.ToLower() == "acompanha" && inRodando > 0 ? 1 : 0;
+            pRegistro.in_rodando = pRegistro.tp_acao.ToLower() == "lote" && inRodando > 0 ? 1 : 0;
 
-            if ((pRegistro.tp_acao.ToLower() == "consulta" && inRodando > 0) || (pRegistro.tp_acao.ToLower() == "acompanha" && OrgaoAnuenteBase != OrgaoAnuenteAtual && inRodando > 0))
+            if ((pRegistro.tp_acao.ToLower() == "consulta" && inRodando > 0) || (pRegistro.tp_acao.ToLower() == "lote" && OrgaoAnuenteBase != OrgaoAnuenteAtual && inRodando > 0))
             {
                 tsiscomexweb_robo novoRegistro = new tsiscomexweb_robo
                 {
@@ -151,11 +152,11 @@ namespace AutoEcac.Servicos
                     nr_registro = pRegistro.nr_registro,
                     nr_seq = pRegistro.nr_seq,
                     tp_consulta = pRegistro.tp_consulta,
-                    tp_acao = "acompanha",
+                    tp_acao = "lote",
                     dt_agendamento = DateTime.Now.AddMinutes(30),
                     dt_realizacao = DateTime.Now,
                     dt_registro_di = pRegistro.dt_registro_di,
-                    nr_tentativas = 1,
+                    nr_tentativas = 0,
                     tx_erro = "",
                     cd_usuario = pRegistro.cd_usuario,
                     cpf_certificado = pRegistro.cpf_certificado,
@@ -173,7 +174,7 @@ namespace AutoEcac.Servicos
             }
             else
             {
-                pRegistro.nr_tentativas = pRegistro.nr_tentativas++;
+                pRegistro.nr_tentativas = pRegistro.nr_tentativas + 1;
                 pRegistro.in_desembaraco = OrgaoAnuenteAtual.Contains("DESEMBARAÇADA") ? 1 : 0;
                 pRegistro.xml_retorno = xmlLiCompleta.OuterXml;
             }
@@ -194,7 +195,7 @@ namespace AutoEcac.Servicos
                     foreach (string numero in pNrConsulta)
                     {
                         int numeroLi = int.Parse(numero);
-                        tsiscomexweb_robo registro = _db.tsiscomexweb_robo.Where(reg => reg.nr_registro == numeroLi).First();
+                        tsiscomexweb_robo registro = _db.tsiscomexweb_robo.Where(reg => reg.nr_registro == numeroLi && reg.tp_acao.ToLower() == "consulta").First();
                         Thread.Sleep(2000);
                         base._consultaAtual = numero;
 
@@ -307,8 +308,7 @@ namespace AutoEcac.Servicos
 
                             NavegarURLExtratoDeclaracaoLI();
 
-                            Thread.Sleep(1000);
-
+                            Thread.Sleep(1000);                            
                             AtualizarLI(this.DiretorioCompleto + "\\" + _NmArquivoNovo, ref registro);
                             _db.SaveChanges();
 
@@ -340,12 +340,183 @@ namespace AutoEcac.Servicos
                 }
 
                 pNrConsulta.Clear();
+                _browser.Quit();
             }
             catch (Exception e)
             {
 
                 LogarErros(DateTime.Now.ToString() + " Consulta Antual: " + _consultaAtual + " Consulta Anterior: " + _consultaAnterior + "Msg: " + e.Message);
 
+            }
+        }
+
+
+        public void ConsultarLILote(Periodo pPeriodo, TipoConsultaExtrato pTipoConsultaExtrato, List<string> pNrConsulta, DateTime pDtInicial, DateTime pDtFinal, int pQtdEmLote)
+        {
+            try
+            {
+                base._periodo = pPeriodo;
+                foreach (DateTime data in LoopNoPeriodo(pDtInicial, pDtFinal))
+                {
+
+                    Thread.Sleep(2000);
+
+                    int ContaLote = 0;
+                    XmlDocument consultaPorLote = new XmlDocument();
+                    consultaPorLote.Load(@"C:\AutoEcac\Arquivos\ConlustaLotePadrao\consultaPorLole.xml");
+                    consultaPorLote.FirstChild.Value = "version=\"1.0\" encoding=\"UTF-8\"";
+                    XmlNode node = consultaPorLote.ChildNodes[1].ChildNodes[1];
+                    node.RemoveAll();
+
+                    string ultimoRegistro = pNrConsulta.Last();
+
+                    foreach (string numero in pNrConsulta)
+                    {
+                        base._consultaAtual = numero;
+                        ContaLote++;
+                        XmlElement elem = consultaPorLote.CreateElement("li", "http://www.serpro.gov.br/liweb/schema/ConsultaLoteLiWeb.html");
+                        elem.InnerText = numero;
+                        node.AppendChild(elem);
+
+
+                        if (ContaLote < pQtdEmLote && numero != ultimoRegistro)
+                        {
+                            continue;
+                        }
+
+                        try
+                        {
+                            ContaLote = 0;
+                            string fileName = "C:\\AutoEcac\\Arquivos\\ConlustaLotePadrao\\consultaPorLole.xml";
+                            string textToAdd = consultaPorLote.InnerXml;
+                            FileStream fs = null;
+                            try
+                            {
+                                fs = new FileStream(fileName, FileMode.Truncate);
+                                using (StreamWriter writer = new StreamWriter(fs, new UTF8Encoding(false)))
+                                {
+                                    writer.Write(textToAdd);
+                                }
+                            }
+                            finally
+                            {
+                                if (fs != null)
+                                    fs.Dispose();
+                            }
+
+
+
+                            _browser.Navigate().GoToUrl("https://www1c.siscomex.receita.fazenda.gov.br/li_web-7/liweb_menu_li_consultar_lote_li.do");
+                            Thread.Sleep(2000);
+                            _browser.FindElement(By.Id("arquivo")).Click();
+                            Thread.Sleep(2000);
+                            System.Windows.Forms.SendKeys.SendWait(@"C:\AutoEcac\Arquivos\ConlustaLotePadrao\consultaPorLole.xml");
+                            Thread.Sleep(2000);
+                            System.Windows.Forms.SendKeys.SendWait(@"{Enter}");
+                            Thread.Sleep(1000);
+                            _browser.FindElement(By.Id("enviarArquivo")).Click();
+                            Thread.Sleep(2000);
+
+                            node.RemoveAll();
+
+                            _NmArquivoPadrao = "CONSULTA.XXXXXX.xml";
+                            _NmArquivoNovo = "consulta.lote.xml";
+                            SalvarArquivosBaixados(_NmArquivoNovo, this.DiretorioCompleto);
+                            TratarXMLConsulta(this.DiretorioCompleto + "\\" + _NmArquivoNovo);
+                            _db.SaveChanges();
+                            Thread.Sleep(1000);
+                            NavegarURLExtratoDeclaracaoLI();
+                            Thread.Sleep(1000);
+
+                        }
+                        catch (Exception e)
+                        {
+                            string msg = DateTime.Now.ToString() + " Erro: Consulta Atual: " + _consultaAtual + " Consulta Anterior: " + _consultaAnterior + " Msg: " + e.Message;
+                            _db.SaveChanges();
+                            LogarErros(msg);
+                            Thread.Sleep(1000);
+                            try
+                            {
+                                _browser.SwitchTo().Alert().Accept();
+
+                            }
+                            catch (Exception)
+                            {
+                                msg = DateTime.Now.ToString() + " Erro: Consulta Atual: " + _consultaAtual + " Consulta Anterior: " + _consultaAnterior + " Msg: " + e.Message;
+                                _db.SaveChanges();
+                                LogarErros(msg);
+                            }
+                        }
+
+                        base._consultaAnterior = _consultaAtual;
+                    }
+
+                }
+
+                pNrConsulta.Clear();
+                _browser.Quit();
+            }
+            catch (Exception e)
+            {
+
+                LogarErros(DateTime.Now.ToString() + " Consulta Antual: " + _consultaAtual + " Consulta Anterior: " + _consultaAnterior + "Msg: " + e.Message);
+
+            }
+        }
+
+        private void TratarXMLConsulta(string pCaminhoCompleto)
+        {
+            tsiscomexweb_robo registro = new tsiscomexweb_robo();
+            try
+            {
+                XmlDocument xmlLiCompleta = new XmlDocument();
+                xmlLiCompleta.Load(@pCaminhoCompleto);
+                XmlNamespaceManager nsMgr = new XmlNamespaceManager(xmlLiCompleta.NameTable);
+                nsMgr.AddNamespace("li", "http://www.serpro.gov.br/liweb/schema/ResultadoConsultaLoteLiWeb.html");
+                XmlNode listaLiCompleta = xmlLiCompleta.SelectSingleNode("/li:resposta-consulta-li/li:lista-li-completa", nsMgr);
+                XmlDocument novoXmlLiCompleta = new XmlDocument();
+                novoXmlLiCompleta.InnerXml = xmlLiCompleta.OuterXml;
+
+
+                
+
+
+                foreach (XmlNode liCompleta in listaLiCompleta)
+                {
+                    XmlNode xmlnumeroLi = liCompleta.ChildNodes[0].FirstChild;
+                    string numero = xmlnumeroLi.InnerText.Replace("/", "").Replace("-", "").Trim();
+                    int numeroLi = int.Parse(numero);
+                    registro = _db.tsiscomexweb_robo.Where(reg => reg.nr_registro == numeroLi && reg.tp_acao.ToLower() == "lote").OrderByDescending(reg => reg.nr_sequencia).First();
+
+                    novoXmlLiCompleta.ChildNodes[1].ChildNodes[2].RemoveAll();
+                    novoXmlLiCompleta.ChildNodes[1].ChildNodes[2].InnerXml = liCompleta.OuterXml;
+
+                    string fileName = this.DiretorioCompleto + "\\" + numero + "_consulta.xml";
+                    string textToAdd = novoXmlLiCompleta.OuterXml;
+                    FileStream fs = null;
+                    try
+                    {
+                        fs = new FileStream(fileName, FileMode.Create);
+                        using (StreamWriter writer = new StreamWriter(fs, new UTF8Encoding(false)))
+                        {
+                            writer.Write(textToAdd);
+                        }
+                    }
+                    finally
+                    {
+                        if (fs != null)
+                            fs.Dispose();
+                    }
+
+                    AtualizarLI(fileName, ref registro);
+
+                }
+            }
+            catch (Exception e)
+            {
+                registro.tx_erro = e.Message;
+                LogarErros(DateTime.Now.ToString() + " Consulta Antual: " + _consultaAtual + " Consulta Anterior: " + _consultaAnterior + "Msg: " + e.Message);
+                _db.SaveChanges();
             }
         }
 
@@ -416,7 +587,7 @@ namespace AutoEcac.Servicos
                     {
                         base._consultaAtual = numero;
                         int nrRegistroDi = Int32.Parse(numero);
-                        tsiscomexweb_robo registro = _db.tsiscomexweb_robo.OrderByDescending(reg => reg.nr_sequencia).Where(reg => reg.nr_registro == nrRegistroDi).First();
+                        tsiscomexweb_robo registro = _db.tsiscomexweb_robo.OrderByDescending(reg => reg.nr_sequencia).Where(reg => reg.nr_registro == nrRegistroDi).OrderByDescending(reg => reg.nr_sequencia).First();
 
                         switch ((int)pTipoConsultaExtrato)
                         {
@@ -534,7 +705,7 @@ namespace AutoEcac.Servicos
 
                         }
                         catch (Exception e)
-                        {                            
+                        {
                             string msg = DateTime.Now.ToString() + " Consulta Antual: " + _consultaAtual + " Consulta Anterior: " + _consultaAnterior + "Msg: " + e.Message;
                             registro.tx_erro = msg;
                             _db.SaveChanges();

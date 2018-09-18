@@ -17,7 +17,8 @@ namespace AutoEcac.Utils
     public enum TipoExtrato
     {
         DI = 0,
-        LI = 1
+        LI = 1,
+        LI_LOTE = 2
     }
 
     public enum TipoConsultaExtrato
@@ -41,21 +42,21 @@ namespace AutoEcac.Utils
 
     public enum InSituacao
     {
-            TODAS = 0,                                
-			PARA_ANALISE = 1,                          
-			EM_ANALISE =  2,                           
-			EM_EXIGENCIA = 3,                          
-			INDEFERIDA = 4,                            
-			DEFERIDA= 5,                               
-			DEFERIDA_JUDICIALMENTE = 6,                
-			DEFERIDA_VINCULADA_DI = 7,               
-			DEFERIDA_JUDICIALMENTE_VINCULADA_DI = 8, 
-			DEFERIDA_RESERVADA = 9,                    
-			DEFERIDA_JUDICIALMENTE_RESERVADA = 10,     
-			EMBARQUE_AUTORIZADO = 15,                  
-			VENCIDA = 16,                              
-			DESEMBARAÇADA = 17,
-			CANCELADA = 18
+        TODAS = 0,
+        PARA_ANALISE = 1,
+        EM_ANALISE = 2,
+        EM_EXIGENCIA = 3,
+        INDEFERIDA = 4,
+        DEFERIDA = 5,
+        DEFERIDA_JUDICIALMENTE = 6,
+        DEFERIDA_VINCULADA_DI = 7,
+        DEFERIDA_JUDICIALMENTE_VINCULADA_DI = 8,
+        DEFERIDA_RESERVADA = 9,
+        DEFERIDA_JUDICIALMENTE_RESERVADA = 10,
+        EMBARQUE_AUTORIZADO = 15,
+        VENCIDA = 16,
+        DESEMBARAÇADA = 17,
+        CANCELADA = 18
     }
 
     #endregion
@@ -74,6 +75,6 @@ namespace AutoEcac.Utils
 
         }
     }
-    
+
 }
 

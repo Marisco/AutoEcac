@@ -24,6 +24,8 @@ using System.Text;
 using System.IO;
 using AutoEcac.model;
 using System.Globalization;
+using DevExpress.XtraScheduler;
+using System.Drawing;
 
 namespace AutoEcac
 {
@@ -177,12 +179,14 @@ namespace AutoEcac
             cbxServico.SelectedIndex = 0;
             cbxperiodo.SelectedIndex = 0;
             rdbNrDeclaracao.PerformClick();
+            rbConsultaDI.Checked = true;
+            rbConsultaLI_Click(sender, e);
 
         }
         #region Eventos Clicks
 
         private void btnOK_Click(object sender, EventArgs e)
-        {     
+        {
             Browser = ConfigurarBrowser();
             IniciarOperacao();
 
@@ -205,8 +209,6 @@ namespace AutoEcac
                 Thread t = new Thread(() => _darfService.ConsultarDARF(periodo, this.fCdReceita, dtpInicial.Value, dtpFinal.Value));
                 t.Start();
 
-
-
             }
             else if (TipoServicoSelecionado == TipoServico.EXTRATO)
             {
@@ -214,10 +216,10 @@ namespace AutoEcac
 
                 List<string> vListaNrConsulta = new List<string>();
                 List<string> vListaCpf = new List<string>();
-                List<string> vListaDi = new List<string>();
+                List<string> vListaDiLi = new List<string>();
 
                 if (TipoExtratoSelecionado == TipoExtrato.DI)
-                {                    
+                {
                     if (TipoConsultaExtratoSelecionado == TipoConsultaExtrato.NumeroDeclaracao)
                     {
                         if (cbxBancoDados.Checked)
@@ -287,11 +289,11 @@ namespace AutoEcac
                             {
                                 if (cpf == di.ToString().Split(';')[1].Trim())
                                 {
-                                    vListaDi.Add(di.ToString().Split(';')[0]);
+                                    vListaDiLi.Add(di.ToString().Split(';')[0]);
                                 }
                             }
                             Periodo periodo = PeriodoSelecionado;
-                            Thread t = new Thread(() => _extratoService.ConsultarDI(periodo, TipoConsultaExtratoSelecionado, vListaDi, dtpInicial.Value, dtpFinal.Value));
+                            Thread t = new Thread(() => _extratoService.ConsultarDI(periodo, TipoConsultaExtratoSelecionado, vListaDiLi, dtpInicial.Value, dtpFinal.Value));
                             t.Start();
                         }
                     }
@@ -300,34 +302,28 @@ namespace AutoEcac
                         FinalizarOperacao();
                     }
 
-
-
                 }
 
-                if (TipoExtratoSelecionado == TipoExtrato.LI)
-                {                    
+                if (TipoExtratoSelecionado == TipoExtrato.LI_LOTE)
+                {
                     if (TipoConsultaExtratoSelecionado == TipoConsultaExtrato.NumeroDeclaracao)
                     {
                         if (cbxBancoDados.Checked)
                         {
-                            var selecaoLI = db.tsiscomexweb_robo.Where(reg => reg.tp_consulta == "LI" && reg.in_rodando == 1).OrderBy(reg => reg.nr_registro);
+                            var selecaoLI = db.tsiscomexweb_robo.Where(reg => reg.tp_consulta.ToLower() == "li" && reg.tp_acao.ToLower() == "lote" && reg.in_rodando == 1).OrderBy(reg => reg.nr_registro);
 
                             foreach (var row in selecaoLI)
                             {
-                                if (row.tp_acao == "consulta" || (row.tp_acao == "acompanha" && row.dt_agendamento <= DateTime.Now))
+                                row.in_rodando = 0;
+
+                                vListaNrConsulta.Add(row.nr_registro.ToString().Trim() + "; " + row.cpf_certificado.ToString().Trim());
+
+                                if (!vListaCpf.Contains(row.cpf_certificado.ToString().Trim()))
                                 {
-                                    row.in_rodando = 0;
-                                    vListaNrConsulta.Add(row.nr_registro.ToString().Trim() + "; " + row.cpf_certificado.ToString().Trim());
-
-                                    if (!vListaCpf.Contains(row.cpf_certificado.ToString().Trim()))
-                                    {
-                                        vListaCpf.Add(row.cpf_certificado.ToString().Trim());
-                                    }
-
+                                    vListaCpf.Add(row.cpf_certificado.ToString().Trim());
                                 }
                             }
                             db.SaveChanges();
-
                         }
 
                         if (!string.IsNullOrEmpty(edtNrConsultaDI.Text.Trim()))
@@ -378,11 +374,98 @@ namespace AutoEcac
                             {
                                 if (cpf == di.ToString().Split(';')[1].Trim())
                                 {
-                                    vListaDi.Add(di.ToString().Split(';')[0]);
+                                    vListaDiLi.Add(di.ToString().Split(';')[0]);
                                 }
                             }
                             Periodo periodo = PeriodoSelecionado;
-                            Thread t = new Thread(() => _extratoService.ConsultarLI(periodo, TipoConsultaExtratoSelecionado, vListaDi, dtpInicial.Value, dtpFinal.Value));
+                            Thread t = new Thread(() => _extratoService.ConsultarLILote(periodo, TipoConsultaExtratoSelecionado, vListaDiLi, dtpInicial.Value, dtpFinal.Value, Convert.ToInt32(qtdArqLote.Value)));                            
+                            t.Start();
+                        }
+                    }
+                    else
+                    {
+                        FinalizarOperacao();
+                    }
+
+                }
+
+
+                if (TipoExtratoSelecionado == TipoExtrato.LI)
+                {
+                    if (TipoConsultaExtratoSelecionado == TipoConsultaExtrato.NumeroDeclaracao)
+                    {
+                        if (cbxBancoDados.Checked)
+                        {
+                            var selecaoLI = db.tsiscomexweb_robo.Where(reg => reg.tp_consulta.ToLower() == "li" && reg.tp_acao.ToLower() == "consulta" && reg.in_rodando == 1 ).OrderBy(reg => reg.nr_registro);
+
+                            foreach (var row in selecaoLI)
+                            {
+                                row.in_rodando = 0;
+
+                                vListaNrConsulta.Add(row.nr_registro.ToString().Trim() + "; " + row.cpf_certificado.ToString().Trim());
+
+                                if (!vListaCpf.Contains(row.cpf_certificado.ToString().Trim()))
+                                {
+                                    vListaCpf.Add(row.cpf_certificado.ToString().Trim());
+                                }
+                            }
+                            db.SaveChanges();
+                        }
+
+                        if (!string.IsNullOrEmpty(edtNrConsultaDI.Text.Trim()))
+                        {
+                            vListaNrConsulta.Add(edtNrConsultaDI.Text.Trim());
+                        }
+
+                        if (dgvNrDelacaracao.Rows.Count > 0)
+                        {
+                            foreach (DataGridViewRow numero in dgvNrDelacaracao.Rows)
+                            {
+                                vListaNrConsulta.Add(numero.Cells[0].Value.ToString());
+                            }
+                        }
+                    }
+                    else
+                    {
+                        vListaNrConsulta.Add(edtNrConsultaDI.Text.Trim());
+                    }
+                    if (vListaCpf.Count() > 0)
+                    {
+
+                        var store = new X509Store(StoreLocation.CurrentUser);
+                        store.Open(OpenFlags.ReadOnly);
+                        var certificados = store.Certificates.OfType<X509Certificate2>().Where(x => x.Issuer.Contains("Secretaria da Receita Federal do Brasil")).OrderBy(x => x.Subject);
+
+                        int qtdSetas = 0;
+
+                        foreach (string cpf in vListaCpf)
+                        {
+                            int i = 0;
+                            foreach (var certificado in certificados)
+                            {
+                                if (certificado.FriendlyName.Contains(cpf))
+                                {
+                                    qtdSetas = i++;
+
+                                }
+                                i++;
+                            }
+
+                            Thread tSeta = new Thread(() => _extratoService.SetarCertificado(qtdSetas));
+                            tSeta.Start();
+                            _extratoService.AbrirBrowser();
+                            _extratoService.NavegarURLExtratoDeclaracaoLI();
+                            Thread.Sleep(2000);
+                            foreach (string di in vListaNrConsulta)
+                            {
+                                if (cpf == di.ToString().Split(';')[1].Trim())
+                                {
+                                    vListaDiLi.Add(di.ToString().Split(';')[0]);
+                                }
+                            }
+                            Periodo periodo = PeriodoSelecionado;
+
+                            Thread t = new Thread(() => _extratoService.ConsultarLI(periodo, TipoConsultaExtratoSelecionado, vListaDiLi, dtpInicial.Value, dtpFinal.Value));
                             t.Start();
                         }
                     }
@@ -504,7 +587,7 @@ namespace AutoEcac
         {
             get
             {
-                return rbConsultaDI.Checked == true ? TipoExtrato.DI : TipoExtrato.LI;
+                return rbConsultaDI.Checked == true ? TipoExtrato.DI : rbConsultaLI.Checked ? TipoExtrato.LI: TipoExtrato.LI_LOTE;
             }
         }
 
@@ -589,18 +672,15 @@ namespace AutoEcac
                     grpDatas.Enabled = false;
                 }
 
-
-
-
             }
         }
 
         private void btnServico_Click(object sender, EventArgs e)
         {
-            if (rbConsultaLI.Checked)
+            if (rbConsultaLI.Checked || rbConsultaLILote.Checked)
             {
                 tempoLI.Enabled = true;
-                tempoLI.Interval = rdbMinutos.Checked ? (int)TimeSpan.FromMinutes(Convert.ToInt32(numericUpDown1.Value)).TotalMilliseconds : (int)TimeSpan.FromHours(Convert.ToInt32(numericUpDown1.Value)).TotalMilliseconds;
+                tempoLI.Interval = (int)TimeSpan.FromMinutes(1).TotalMilliseconds;
                 tempoLI_Tick(sender, null);
 
             }
@@ -624,10 +704,44 @@ namespace AutoEcac
 
         private void tempoLI_Tick(object sender, EventArgs e)
         {
-            rbConsultaLI.Checked = true;
+            //rbConsultaLI.Checked = true;
             cbxBancoDados.Checked = true;
             panel3_MouseClick(sender, null);
-            btnOK_Click(sender, e);
+
+            foreach (DataGridViewRow row in dgvHoraLI.Rows)
+            {
+                if (row.Cells[0].Value.ToString() == DateTime.Now.ToShortTimeString().ToString())
+                {
+                    btnOK_Click(sender, e);
+                }
+            }
+        }
+
+        private void rbConsultaLI_Click(object sender, EventArgs e)
+        {
+            grbPeriodocidadeLI.Enabled = rbConsultaLI.Checked || rbConsultaLILote.Checked;
+            dtpLi.Enabled = rbConsultaLI.Checked || rbConsultaLILote.Checked;
+            btnAddTempo.Enabled = rbConsultaLI.Checked || rbConsultaLILote.Checked;
+
+
+            dgvHoraLI.Enabled = rbConsultaLI.Checked || rbConsultaLILote.Checked;
+            dgvHoraLI.BackgroundColor = rbConsultaLI.Checked || rbConsultaLILote.Checked ? Color.LightYellow : Color.LightGray;
+
+            qtdArqLote.Enabled = rbConsultaLILote.Checked;
+            lblArqLote.Enabled = rbConsultaLILote.Checked;
+
+
+
+            grbTempo.Enabled = rbConsultaDI.Checked;
+            rdbHora.Enabled = rbConsultaDI.Checked;
+            rdbMinutos.Enabled = rbConsultaDI.Checked;
+
+        }
+
+        private void btnAddTempo_Click(object sender, EventArgs e)
+        {
+            dgvHoraLI.Rows.Add(dtpLi.Value.ToShortTimeString().ToString());
+
         }
     }
 }
