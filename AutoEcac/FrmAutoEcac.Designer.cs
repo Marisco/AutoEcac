@@ -74,6 +74,7 @@
             this.dtpLi = new System.Windows.Forms.DateTimePicker();
             this.dgvHoraLI = new System.Windows.Forms.DataGridView();
             this.dataGridViewTextBoxColumn1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.tempoLiLote = new System.Windows.Forms.Timer(this.components);
             this.grpDatas.SuspendLayout();
             this.grpServicos.SuspendLayout();
             this.grpPerfil.SuspendLayout();
@@ -597,6 +598,11 @@
             this.dataGridViewTextBoxColumn1.Name = "dataGridViewTextBoxColumn1";
             this.dataGridViewTextBoxColumn1.ReadOnly = true;
             // 
+            // tempoLiLote
+            // 
+            this.tempoLiLote.Interval = 30000;
+            this.tempoLiLote.Tick += new System.EventHandler(this.tempoLiLote_Tick);
+            // 
             // frmAutoEcac
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -689,6 +695,7 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn1;
         private System.Windows.Forms.Label lblArqLote;
         private System.Windows.Forms.NumericUpDown qtdArqLote;
+        private System.Windows.Forms.Timer tempoLiLote;
     }
 }
 

@@ -377,7 +377,7 @@ namespace AutoEcac
                                 }
                             }
                             Periodo periodo = PeriodoSelecionado;
-                            Thread t = new Thread(() => _extratoService.ConsultarLILote(periodo, TipoConsultaExtratoSelecionado, vListaDiLi, dtpInicial.Value, dtpFinal.Value, Convert.ToInt32(qtdArqLote.Value)));                            
+                            Thread t = new Thread(() => _extratoService.ConsultarLILote(periodo, TipoConsultaExtratoSelecionado, vListaDiLi, dtpInicial.Value, dtpFinal.Value, Convert.ToInt32(qtdArqLote.Value)));
                             t.Start();
                         }
                     }
@@ -395,7 +395,7 @@ namespace AutoEcac
                     {
                         if (cbxBancoDados.Checked)
                         {
-                            var selecaoLI = db.tsiscomexweb_robo.Where(reg => reg.tp_consulta.ToLower() == "li" && reg.tp_acao.ToLower() == "consulta" && reg.in_rodando == 1 ).OrderBy(reg => reg.nr_registro);
+                            var selecaoLI = db.tsiscomexweb_robo.Where(reg => reg.tp_consulta.ToLower() == "li" && reg.tp_acao.ToLower() == "consulta" && reg.in_rodando == 1).OrderBy(reg => reg.nr_registro);
 
                             foreach (var row in selecaoLI)
                             {
@@ -586,7 +586,7 @@ namespace AutoEcac
         {
             get
             {
-                return rbConsultaDI.Checked == true ? TipoExtrato.DI : rbConsultaLI.Checked ? TipoExtrato.LI: TipoExtrato.LI_LOTE;
+                return rbConsultaDI.Checked == true ? TipoExtrato.DI : rbConsultaLI.Checked ? TipoExtrato.LI : TipoExtrato.LI_LOTE;
             }
         }
 
@@ -676,34 +676,42 @@ namespace AutoEcac
 
         private void btnServico_Click(object sender, EventArgs e)
         {
-            if (rbConsultaLI.Checked || rbConsultaLILote.Checked)
+            if (rbConsultaLI.Checked)
             {
                 tempoLI.Enabled = true;
-                tempoLI.Interval = (int)TimeSpan.FromMinutes(1).TotalMilliseconds;
+                tempoLI.Interval = rdbMinutos.Checked ? (int)TimeSpan.FromMinutes(Convert.ToInt32(numericUpDown1.Value)).TotalMilliseconds : (int)TimeSpan.FromHours(Convert.ToInt32(numericUpDown1.Value)).TotalMilliseconds;
                 tempoLI_Tick(sender, null);
 
             }
-            else
+            else if (rbConsultaDI.Checked)
             {
                 tempoDI.Enabled = true;
                 tempoDI.Interval = rdbMinutos.Checked ? (int)TimeSpan.FromMinutes(Convert.ToInt32(numericUpDown1.Value)).TotalMilliseconds : (int)TimeSpan.FromHours(Convert.ToInt32(numericUpDown1.Value)).TotalMilliseconds;
                 tempoDI_Tick(sender, null);
             }
+            else
+            {
+                tempoLiLote.Enabled = true;
+                tempoLI.Interval = (int)TimeSpan.FromMinutes(1).TotalMilliseconds;
+                tempoLiLote_Tick(sender, null);
+
+            }
 
         }
 
+
+
         private void tempoDI_Tick(object sender, EventArgs e)
         {
-            rbConsultaDI.Checked = true;
+            //rbConsultaDI.Checked = true;
             cbxBancoDados.Checked = true;
             panel3_MouseClick(sender, null);
             btnOK_Click(sender, e);
 
         }
 
-        private void tempoLI_Tick(object sender, EventArgs e)
+        private void tempoLiLote_Tick(object sender, EventArgs e)
         {
-            //rbConsultaLI.Checked = true;
             cbxBancoDados.Checked = true;
             panel3_MouseClick(sender, null);
 
@@ -716,24 +724,29 @@ namespace AutoEcac
             }
         }
 
+        private void tempoLI_Tick(object sender, EventArgs e)
+        {
+            cbxBancoDados.Checked = true;
+            panel3_MouseClick(sender, null);
+            btnOK_Click(sender, e);
+        }
+
         private void rbConsultaLI_Click(object sender, EventArgs e)
         {
-            grbPeriodocidadeLI.Enabled = rbConsultaLI.Checked || rbConsultaLILote.Checked;
-            dtpLi.Enabled = rbConsultaLI.Checked || rbConsultaLILote.Checked;
-            btnAddTempo.Enabled = rbConsultaLI.Checked || rbConsultaLILote.Checked;
+            grbPeriodocidadeLI.Enabled = rbConsultaLILote.Checked;
+            dtpLi.Enabled =  rbConsultaLILote.Checked;
+            btnAddTempo.Enabled = rbConsultaLILote.Checked;
 
 
-            dgvHoraLI.Enabled = rbConsultaLI.Checked || rbConsultaLILote.Checked;
-            dgvHoraLI.BackgroundColor = rbConsultaLI.Checked || rbConsultaLILote.Checked ? Color.LightYellow : Color.LightGray;
+            dgvHoraLI.Enabled = rbConsultaLILote.Checked;
+            dgvHoraLI.BackgroundColor = rbConsultaLILote.Checked ? Color.LightYellow : Color.LightGray;
 
             qtdArqLote.Enabled = rbConsultaLILote.Checked;
             lblArqLote.Enabled = rbConsultaLILote.Checked;
 
-
-
-            grbTempo.Enabled = rbConsultaDI.Checked;
-            rdbHora.Enabled = rbConsultaDI.Checked;
-            rdbMinutos.Enabled = rbConsultaDI.Checked;
+            grbTempo.Enabled = rbConsultaDI.Checked || rbConsultaLI.Checked;
+            rdbHora.Enabled = rbConsultaDI.Checked || rbConsultaLI.Checked;
+            rdbMinutos.Enabled = rbConsultaDI.Checked || rbConsultaLI.Checked;
 
         }
 
@@ -742,5 +755,7 @@ namespace AutoEcac
             dgvHoraLI.Rows.Add(dtpLi.Value.ToShortTimeString().ToString());
 
         }
+
+        
     }
 }

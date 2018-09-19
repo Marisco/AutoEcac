@@ -143,6 +143,8 @@ namespace AutoEcac.Servicos
 
             pRegistro.tp_anuencia = OrgaoAnuenteAtual;
             pRegistro.in_rodando = pRegistro.tp_acao.ToLower() == "lote" && inRodando > 0 ? 1 : 0;
+            pRegistro.xml_comando = xmlLiCompleta.OuterXml;
+            pRegistro.nr_tentativas = pRegistro.nr_tentativas + 1;
 
             if ((pRegistro.tp_acao.ToLower() == "consulta" && inRodando > 0) || (pRegistro.tp_acao.ToLower() == "lote" && OrgaoAnuenteBase != OrgaoAnuenteAtual && inRodando > 0))
             {
@@ -174,9 +176,10 @@ namespace AutoEcac.Servicos
             }
             else
             {
-                pRegistro.nr_tentativas = pRegistro.nr_tentativas + 1;
+                
                 pRegistro.in_desembaraco = OrgaoAnuenteAtual.Contains("DESEMBARAÇADA") ? 1 : 0;
                 pRegistro.xml_retorno = xmlLiCompleta.OuterXml;
+                
             }
 
 
@@ -317,6 +320,7 @@ namespace AutoEcac.Servicos
                         {
                             string msg = DateTime.Now.ToString() + " Erro: Consulta Atual: " + _consultaAtual + " Consulta Anterior: " + _consultaAnterior + " Msg: " + e.Message;
                             registro.tx_erro = msg;
+                            registro.in_rodando = 1;
                             _db.SaveChanges();
                             LogarErros(msg);
                             Thread.Sleep(1000);
@@ -329,6 +333,7 @@ namespace AutoEcac.Servicos
                             {
                                 msg = DateTime.Now.ToString() + " Erro: Consulta Atual: " + _consultaAtual + " Consulta Anterior: " + _consultaAnterior + " Msg: " + e.Message;
                                 registro.tx_erro = msg;
+                                registro.in_rodando = 1;
                                 _db.SaveChanges();
                                 LogarErros(msg);
                             }
@@ -344,7 +349,7 @@ namespace AutoEcac.Servicos
             }
             catch (Exception e)
             {
-
+                
                 LogarErros(DateTime.Now.ToString() + " Consulta Antual: " + _consultaAtual + " Consulta Anterior: " + _consultaAnterior + "Msg: " + e.Message);
 
             }
@@ -432,7 +437,7 @@ namespace AutoEcac.Servicos
                         catch (Exception e)
                         {
                             string msg = DateTime.Now.ToString() + " Erro: Consulta Atual: " + _consultaAtual + " Consulta Anterior: " + _consultaAnterior + " Msg: " + e.Message;
-                            _db.SaveChanges();
+                            _db.SaveChanges();                            
                             LogarErros(msg);
                             Thread.Sleep(1000);
                             try
@@ -515,6 +520,7 @@ namespace AutoEcac.Servicos
             catch (Exception e)
             {
                 registro.tx_erro = e.Message;
+                registro.in_rodando = 1;
                 LogarErros(DateTime.Now.ToString() + " Consulta Antual: " + _consultaAtual + " Consulta Anterior: " + _consultaAnterior + "Msg: " + e.Message);
                 _db.SaveChanges();
             }
@@ -708,6 +714,7 @@ namespace AutoEcac.Servicos
                         {
                             string msg = DateTime.Now.ToString() + " Consulta Antual: " + _consultaAtual + " Consulta Anterior: " + _consultaAnterior + "Msg: " + e.Message;
                             registro.tx_erro = msg;
+                            registro.in_rodando = 1;
                             _db.SaveChanges();
                             LogarErros(msg);
 
