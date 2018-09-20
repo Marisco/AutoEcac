@@ -93,6 +93,8 @@ namespace AutoEcac
         {
             LimpaServicos();
             Browser.Quit();
+            Browser.Dispose();
+            Browser = null;
             Thread.Sleep(2000);
         }
 
@@ -301,6 +303,7 @@ namespace AutoEcac
                         FinalizarOperacao();
                     }
 
+                    
                 }
 
                 if (TipoExtratoSelecionado == TipoExtrato.LI_LOTE)
@@ -464,14 +467,14 @@ namespace AutoEcac
                             }
                             Periodo periodo = PeriodoSelecionado;
 
-                            Thread t = new Thread(() => _extratoService.ConsultarLI(periodo, TipoConsultaExtratoSelecionado, vListaDiLi, dtpInicial.Value, dtpFinal.Value));
-                            t.Start();
+                            _extratoService.ConsultarLI(periodo, TipoConsultaExtratoSelecionado, vListaDiLi, dtpInicial.Value, dtpFinal.Value);                            
                         }
                     }
-                    else
-                    {
-                        FinalizarOperacao();
-                    }
+                    
+                     FinalizarOperacao();
+                    
+
+                    
 
                 }
             }
@@ -677,7 +680,7 @@ namespace AutoEcac
         private void btnServico_Click(object sender, EventArgs e)
         {
             if (rbConsultaLI.Checked)
-            {
+            {                
                 tempoLI.Enabled = true;
                 tempoLI.Interval = rdbMinutos.Checked ? (int)TimeSpan.FromMinutes(Convert.ToInt32(numericUpDown1.Value)).TotalMilliseconds : (int)TimeSpan.FromHours(Convert.ToInt32(numericUpDown1.Value)).TotalMilliseconds;
                 tempoLI_Tick(sender, null);
@@ -726,9 +729,15 @@ namespace AutoEcac
 
         private void tempoLI_Tick(object sender, EventArgs e)
         {
-            cbxBancoDados.Checked = true;
-            panel3_MouseClick(sender, null);
-            btnOK_Click(sender, e);
+
+            if (Browser == null)
+            {
+                cbxBancoDados.Checked = true;
+                panel3_MouseClick(sender, null);
+                btnOK_Click(sender, e);
+
+            }
+            
         }
 
         private void rbConsultaLI_Click(object sender, EventArgs e)
