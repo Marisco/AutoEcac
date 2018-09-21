@@ -489,7 +489,7 @@ namespace AutoEcac
             }
             //}
 
-        }
+        }       
 
 
 
@@ -679,6 +679,7 @@ namespace AutoEcac
 
         private void btnServico_Click(object sender, EventArgs e)
         {
+            if (Helper.ChecarConexaoInternet()) { 
             if (rbConsultaLI.Checked)
             {                
                 tempoLI.Enabled = true;
@@ -697,6 +698,12 @@ namespace AutoEcac
                 tempoLiLote.Enabled = true;
                 tempoLI.Interval = (int)TimeSpan.FromMinutes(1).TotalMilliseconds;
                 tempoLiLote_Tick(sender, null);
+
+            }
+            }
+            else
+            {
+                MessageBox.Show("Sem conexão com a Internet!");                
 
             }
 

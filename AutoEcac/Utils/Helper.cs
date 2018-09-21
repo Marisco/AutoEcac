@@ -1,5 +1,6 @@
 ﻿using System.Globalization;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Xml;
 
@@ -74,7 +75,23 @@ namespace AutoEcac.Utils
             return new string(chars.ToArray()).Normalize(NormalizationForm.FormC);
 
         }
-    }
+
+        public static bool ChecarConexaoInternet()
+        {
+            try
+            {
+                using (var client = new WebClient())
+                using (client.OpenRead("https://www1.siscomex.receita.fazenda.gov.br/siscomexImpweb-7/login_cert.jsp"))
+                {
+                    return true;
+                }
+            }
+            catch
+            {
+                return false;
+            }
+        }
+    }   
 
 }
 
