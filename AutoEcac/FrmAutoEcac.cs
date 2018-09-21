@@ -402,7 +402,7 @@ namespace AutoEcac
 
                             foreach (var row in selecaoLI)
                             {
-                                row.in_rodando = 0;
+                                //row.in_rodando = 0;
 
                                 vListaNrConsulta.Add(row.nr_registro.ToString().Trim() + "; " + row.cpf_certificado.ToString().Trim());
 
@@ -411,7 +411,7 @@ namespace AutoEcac
                                     vListaCpf.Add(row.cpf_certificado.ToString().Trim());
                                 }
                             }
-                            db.SaveChanges();
+                            //db.SaveChanges();
                         }
 
                         if (!string.IsNullOrEmpty(edtNrConsultaDI.Text.Trim()))
