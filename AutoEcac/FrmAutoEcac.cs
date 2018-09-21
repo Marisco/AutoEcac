@@ -456,6 +456,7 @@ namespace AutoEcac
                             Thread tSeta = new Thread(() => _extratoService.SetarCertificado(qtdSetas));
                             tSeta.Start();
                             _extratoService.AbrirBrowser();
+                            Thread.Sleep(2000);
                             _extratoService.NavegarURLExtratoDeclaracaoLI();
                             Thread.Sleep(2000);
                             foreach (string di in vListaNrConsulta)
@@ -465,16 +466,11 @@ namespace AutoEcac
                                     vListaDiLi.Add(di.ToString().Split(';')[0]);
                                 }
                             }
-                            Periodo periodo = PeriodoSelecionado;
-
+                            Periodo periodo = PeriodoSelecionado;                           
                             _extratoService.ConsultarLI(periodo, TipoConsultaExtratoSelecionado, vListaDiLi, dtpInicial.Value, dtpFinal.Value);                            
                         }
-                    }
-                    
-                     FinalizarOperacao();
-                    
-
-                    
+                    }                    
+                     FinalizarOperacao();                    
 
                 }
             }
