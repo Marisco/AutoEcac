@@ -1,0 +1,44 @@
+{
+  "items": {
+    "seq": 474,
+    "cnpjRaiz": "ABCDEFGHI",
+    "codigo": "ABCDEFGHIJKLMNOPQRSTUVWXYZA",
+    "nome": "ABCDE",
+    "logradouro": "ABCDEFGHIJKLMNOPQRSTUVWXYZA",
+    "nomeCidade": "ABCDEFGHIJKLMNOPQRSTUV",
+    "codigoSubdivisaoPais": "ABCDEFGHIJKLMNOPQRSTUVWXYZAB",
+    "codigoPais": "ABCDEFGHIJKLMNOPQRSTUV",
+    "cep": "ABCDEFGHIJKLMNOPQRSTUVWXYZAB"
+  }
+}
+
+{
+  "items": {
+    "seq": 474,
+    "codigo": null,
+    "descricao": null,
+    "cnpjRaiz": "ABCDEFGHIJKLMNOPQRSTU",
+    "situacao": "ABCDEFGHIJKLMNOPQRSTUVWXY",
+    "modalidade": "ABCDE",
+    "ncm": "ABCDE",
+    "codigoNaladi": null,
+    "codigoGPC": null,
+    "codigoGPCBrick": null,
+    "codigoUNSPSC": null,
+    "paisOrigem": "ABCDEFGHIJKLMNOPQRSTUV",
+    "cpfCnpjFabricante": "ABCDEFGHIJKLMNOPQRSTUVWXYZAB",
+    "fabricanteConhecido": true,
+    "codigoOperadorEstrangeiro": 848,
+    "atributos": [
+      {
+        "atributo": "ABCDEFGHIJ",
+        "valor": "ABCD"
+      },
+      {
+        "atributo": "ABCDEFGHIJ",
+        "valor": "ABCDEFGHIJKLMNOPQRSTUVWX"
+      }
+    ],
+    "codigosInterno": null
+  }
+}
