@@ -175,6 +175,28 @@ namespace AutoEcac
 
         private void Form1_Load(object sender, EventArgs e)
         {
+
+            //var arquivoXml = System.IO.File.ReadAllBytes("C:\\AutoEcac\\Arquivos\\EXTRATO\\DI\\1816853340_declaracao.xml");
+            //KestraaUploadRequest uploadRequest = new KestraaUploadRequest("1816853340_declaracao.xml", arquivoXml, "Import Declaration - DI",
+            //    "1816853340",
+            //    DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss"),
+            //    "99999999", "xml");
+
+            var arquivoXml = System.IO.File.ReadAllBytes("C:\\AutoEcac\\Arquivos\\EXTRATO\\DI\\1704276375_extrato.pdf");
+            KestraaUploadRequest uploadRequest = new KestraaUploadRequest("1704276375_extrato.pdf", arquivoXml, "Other",
+                "1816853340",
+                DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss"),
+                "15714", "pdf");
+
+            //var arquivoXml = System.IO.File.ReadAllBytes("C:\\AutoEcac\\Arquivos\\EXTRATO\\DI\\BalancaComercial.jpg");
+            //KestraaUploadRequest uploadRequest = new KestraaUploadRequest("1816853340_comprovante.pdf", arquivoXml, "chris",
+            //    "1816853340",
+            //    DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss"),
+            //    "99", "pdf");
+
+            KestraaUpload kestraaUpload = new KestraaUpload();
+            kestraaUpload.enviarArquivosws(uploadRequest, 15714);
+
             CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.GetCultureInfo("en-US");
             //Browser = ConfigurarBrowser();
             cbxServico.SelectedIndex = 0;

@@ -657,9 +657,9 @@ namespace AutoEcac.Servicos
                             KestraaUploadRequest uploadRequest = new KestraaUploadRequest(_NmArquivoNovo, arquivoXml, "Import Declaration - DI",
                                 numero,
                                 DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss"),
-                                "99999999");
+                                "99999999", "xml");
 
-                            _kestraaUpload.enviarArquivosws(uploadRequest, registro.nr_registro);
+                            _kestraaUpload.enviarArquivosws(uploadRequest, registro.nr_processo);
 
                             //System.IO.File.Delete(this.DiretorioCompleto + "\\" + _NmArquivoNovo);
 
@@ -676,7 +676,7 @@ namespace AutoEcac.Servicos
                             uploadRequest = new KestraaUploadRequest(_NmArquivoNovo, arquivoPdf, "Other",
                                 numero,
                                 DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss"),
-                                "99999999");
+                                "99999999", "pdf");
 
                             _kestraaUpload.enviarArquivosws(uploadRequest, registro.nr_processo);
                             //System.IO.File.Delete(this.DiretorioCompleto + "\\" + _NmArquivoNovo);
@@ -699,7 +699,7 @@ namespace AutoEcac.Servicos
                                 uploadRequest = new KestraaUploadRequest(_NmArquivoNovo, arquivoPdf, "Other",
                                     numero,
                                     DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss"),
-                                    "99999999");
+                                    "99999999", "pdf");
 
                                 _kestraaUpload.enviarArquivosws(uploadRequest, registro.nr_processo);
                                 //System.IO.File.Delete(this.DiretorioCompleto + "\\" + _NmArquivoNovo);
@@ -863,7 +863,7 @@ namespace AutoEcac.Servicos
                 KestraaUploadRequest uploadRequest = new KestraaUploadRequest(pNumerorDi + "_situacao.xml", arquivoXml, "Other",
                             pNumerorDi,
                             DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss"),
-                            "99999999");
+                            "99999999", "xml");
 
                 _kestraaUpload.enviarArquivosws(uploadRequest, pRegistro.nr_processo);
                 //System.IO.File.Delete(this.DiretorioCompleto + "\\" + pNumerorDi + "_situacao.xml");
@@ -912,10 +912,10 @@ namespace AutoEcac.Servicos
                 pRegistro.in_rodando = 0;
 
                 var arquivoXml = System.IO.File.ReadAllBytes(this.DiretorioCompleto + "\\" + pNumerorDi + "_situacao.xml");
-                KestraaUploadRequest uploadRequest = new KestraaUploadRequest(pNumerorDi + "_situacao.xml", arquivoXml, "xml",
+                KestraaUploadRequest uploadRequest = new KestraaUploadRequest(pNumerorDi + "_situacao.xml", arquivoXml, "Other",
                             "NUMERODI - XML Comando",
                             DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss"),
-                            "99999999");
+                            "99999999", "xml");
 
                 _kestraaUpload.enviarArquivosws(uploadRequest, pRegistro.nr_processo);
                 //System.IO.File.Delete(this.DiretorioCompleto + "\\" + pNumerorDi + "_situacao.xml");

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -15,10 +16,12 @@ namespace AutoEcac.model
 		public string fileReference { get; set; }
 		public string issueDate { get; set; }
 		public string userId { get; set; }
-		
-		public string fileName { get; set; }
+        public string headerValue { get; set; }
 
-		public KestraaUploadRequest(string fileName, byte[] fileToUpload, String fileType, String fileReference, String issueDate, String userId)
+        public string fileName { get; set; }
+
+		public KestraaUploadRequest(string fileName, byte[] fileToUpload, String fileType, String fileReference, 
+            String issueDate, String userId, String headerValue)
 		{
 			this.fileName = fileName;
 			this.fileToUpload = fileToUpload;
@@ -26,16 +29,20 @@ namespace AutoEcac.model
 			this.fileReference = fileReference;
 			this.issueDate = issueDate;
 			this.userId = userId;
-		}
+            this.headerValue = headerValue;
+        }
 
 		public MultipartFormDataContent getFormContent()
-		{
-			var fileToUploadContent = new ByteArrayContent(fileToUpload);
-			fileToUploadContent.Headers.ContentType = MediaTypeHeaderValue.Parse("text/xml");
+		{            
 
-			return new MultipartFormDataContent
+
+            var fileToUploadContent = new ByteArrayContent(fileToUpload, 0, fileToUpload.Length);
+			fileToUploadContent.Headers.Add("content-type", "application/" + headerValue);
+            
+            
+            return new MultipartFormDataContent
 			{
-				{ fileToUploadContent, "fileToUpload", fileName},
+				{ fileToUploadContent, "file", fileName},
 				{ new StringContent(fileType), "fileType"},
 				{ new StringContent(fileReference), "fileReference"},
 				{ new StringContent(issueDate), "issueDate"},
