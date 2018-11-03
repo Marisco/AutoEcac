@@ -44,7 +44,6 @@ namespace AutoEcac.Servicos
             _browser.Navigate().GoToUrl(URL_EXTRATO_DECLARACAO_LI);
         }
 
-
         public void AtualizarLI(string pCaminhoComnpleto, ref tsiscomexweb_robo pRegistro)
         {
             string orgaoAnuente = "";
@@ -354,8 +353,7 @@ namespace AutoEcac.Servicos
 
             }
         }
-
-
+        
         public void ConsultarLILote(Periodo pPeriodo, TipoConsultaExtrato pTipoConsultaExtrato, List<string> pNrConsulta, DateTime pDtInicial, DateTime pDtFinal, int pQtdEmLote)
         {
             try
@@ -525,7 +523,6 @@ namespace AutoEcac.Servicos
                 _db.SaveChanges();
             }
         }
-
 
         private List<string> getListaLI()
         {

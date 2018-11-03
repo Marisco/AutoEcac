@@ -35,155 +35,7 @@ namespace AutoEcac
         private string fCdReceita;
         protected IWebDriver Browser;
         protected roboEntities db;
-        ExtratoService _extratoRodando = new ExtratoService();
-
-
-        public frmAutoEcac()
-        {
-            InitializeComponent();
-            //btnServico.Enabled = false;
-            //cbxBancoDados.Checked = false;
-            //Browser = ConfigurarBrowser();
-            LimpaServicos();
-        }
-
-        private void LimpaServicos()
-        {
-            _extratoService = null;
-            _darfService = null;
-            db = null;
-        }
-
-        private void IniciarOperacao()
-        {
-            LimpaServicos();
-
-            if (TipoServicoSelecionado == TipoServico.DARF)
-            {
-                _darfService = new DARFService(Browser)
-                {
-                    _tipoServicoSelecionado = TipoServico.DARF,
-                    _CNPJ = edtCNPJ.Text.Trim()
-                };
-
-                _darfService.AbrirBrowser();
-
-            }
-            else if (TipoServicoSelecionado == TipoServico.EXTRATO)
-            {
-                db = new roboEntities();
-                _extratoService = new ExtratoService(Browser, db)
-                {
-                    _tipoServicoSelecionado = TipoServico.EXTRATO,
-                    _tipoExtratoSelecionado = TipoExtratoSelecionado,
-                    _CNPJ = edtCNPJ.Text.Trim()
-                };
-                //_extratoService.AbrirBrowser();
-            }
-            else
-            {
-                MessageBox.Show("Serviço não implementado.");
-                return;
-            }
-
-            Thread.Sleep(2000);
-        }
-
-        private void FinalizarOperacao()
-        {
-            LimpaServicos();
-            Browser.Quit();
-            Browser.Dispose();
-            Browser = null;
-            Thread.Sleep(2000);
-        }
-
-        private bool AlterarPerfil()
-        {
-            if (TipoServicoSelecionado == TipoServico.DARF && !string.IsNullOrEmpty(edtCNPJ.Text))
-            {
-                Browser.FindElement(By.Id("btnPerfil")).Click();
-                Thread.Sleep(2000);
-
-                Browser.FindElement(By.Id("txtNIPapel2")).SendKeys(edtCNPJ.Text);
-                Browser.FindElement(By.XPath("//input[contains(@onclick,'formPJ')]")).Click();
-                Thread.Sleep(2000);
-
-                if (Browser.FindElement(By.ClassName("erro")).Text.Contains("ATENÇÃO"))
-                {
-                    MessageBox.Show("Seu Browser irá reiniciar. Verifique sua procuração eletrônica!", "Auto-Ecac", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    Browser.FindElement(By.ClassName("ui-icon-closethick")).Click();
-                    Browser.FindElement(By.Id("sairSeguranca")).Click();
-                    return false;
-                }
-                else
-                {
-                    return true;
-                }
-            }
-            else if (TipoServicoSelecionado == TipoServico.EXTRATO && !rdbNrDeclaracao.Checked && string.IsNullOrEmpty(edtNrConsultaDI.Text.Trim()))
-            {
-                MessageBox.Show("Campo Nº Obrigatório", "Auto-Siscomex Importacao", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return false;
-            }
-            else
-            {
-                return true;
-            }
-        }
-
-        private Boolean ValidarCampos()
-        {
-            if ((TipoServicoSelecionado == TipoServico.EXTRATO) && ((dtpInicial.Value == null) || (dtpFinal.Value == null)) && !rdbNrDeclaracao.Checked)
-            {
-                MessageBox.Show("Data inicial e Final de consulta obrigatória.", "Auto-Siscomex", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return false;
-            }
-
-            if (TipoServicoSelecionado == TipoServico.NENHUM)
-            {
-                MessageBox.Show("Selecione um serviço AutoEcac", "Auto-Ecac", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return false;
-            }
-            else if (PeriodoSelecionado == Periodo.NENHUM)
-            {
-                MessageBox.Show("Selecione a periodicidade de consulta e armazenamento", "Auto-Ecac", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return false;
-            }
-            else
-            {
-                return true;
-            }
-        }
-
-        private ChromeDriver ConfigurarBrowser()
-        {
-            var service = ChromeDriverService.CreateDefaultService();
-            service.HideCommandPromptWindow = true;
-
-            var options = new ChromeOptions();
-            options.AddArguments("disable-infobars");
-            options.AddArgument("--safebrowsing-disable-download-protection");
-            //options.AddArguments($"user-data-dir=C:/Users/{Environment.UserName}/AppData/Local/Google/Chrome/User Data/Default");
-            options.AddUserProfilePreference("download.prompt_for_download", false);
-            options.AddUserProfilePreference("download.directory_upgrade", true);
-            options.AddUserProfilePreference("safebrowsing.enabled", true);
-            //options.LeaveBrowserRunning = true;
-            //options.AcceptInsecureCertificates = true;
-            return new ChromeDriver(service, options);
-        }
-
-        private void Form1_Load(object sender, EventArgs e)
-        {
-            CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.GetCultureInfo("en-US");
-            //Browser = ConfigurarBrowser();
-            cbxServico.SelectedIndex = 0;
-            cbxperiodo.SelectedIndex = 0;
-            rdbNrDeclaracao.PerformClick();
-            rbConsultaDI.Checked = true;
-            rbConsultaLI_Click(sender, e);
-
-        }
+        ExtratoService _extratoRodando = new ExtratoService();        
 
         #region Eventos Clicks
 
@@ -488,7 +340,63 @@ namespace AutoEcac
 
         }
 
+        private void btnServico_Click(object sender, EventArgs e)
+        {
+            if (Helper.ChecarConexaoInternet())
+            {
+                if (rbConsultaLI.Checked)
+                {
+                    tempoLI.Enabled = true;
+                    tempoLI.Interval = rdbMinutos.Checked ? (int)TimeSpan.FromMinutes(Convert.ToInt32(numericUpDown1.Value)).TotalMilliseconds : (int)TimeSpan.FromHours(Convert.ToInt32(numericUpDown1.Value)).TotalMilliseconds;
+                    tempoLI_Tick(sender, null);
 
+                }
+                else if (rbConsultaDI.Checked)
+                {
+                    tempoDI.Enabled = true;
+                    tempoDI.Interval = rdbMinutos.Checked ? (int)TimeSpan.FromMinutes(Convert.ToInt32(numericUpDown1.Value)).TotalMilliseconds : (int)TimeSpan.FromHours(Convert.ToInt32(numericUpDown1.Value)).TotalMilliseconds;
+                    tempoDI_Tick(sender, null);
+                }
+                else
+                {
+                    tempoLiLote.Enabled = true;
+                    tempoLI.Interval = (int)TimeSpan.FromMinutes(1).TotalMilliseconds;
+                    tempoLiLote_Tick(sender, null);
+
+                }
+            }
+            else
+            {
+                MessageBox.Show("Sem conexão com a Internet!");
+
+            }
+
+        }
+
+        private void rbConsultaLI_Click(object sender, EventArgs e)
+        {
+            grbPeriodocidadeLI.Enabled = rbConsultaLILote.Checked;
+            dtpLi.Enabled = rbConsultaLILote.Checked;
+            btnAddTempo.Enabled = rbConsultaLILote.Checked;
+
+
+            dgvHoraLI.Enabled = rbConsultaLILote.Checked;
+            dgvHoraLI.BackgroundColor = rbConsultaLILote.Checked ? Color.LightYellow : Color.LightGray;
+
+            qtdArqLote.Enabled = rbConsultaLILote.Checked;
+            lblArqLote.Enabled = rbConsultaLILote.Checked;
+
+            grbTempo.Enabled = rbConsultaDI.Checked || rbConsultaLI.Checked;
+            rdbHora.Enabled = rbConsultaDI.Checked || rbConsultaLI.Checked;
+            rdbMinutos.Enabled = rbConsultaDI.Checked || rbConsultaLI.Checked;
+
+        }
+
+        private void btnAddTempo_Click(object sender, EventArgs e)
+        {
+            dgvHoraLI.Rows.Add(dtpLi.Value.ToShortTimeString().ToString());
+
+        }
 
         private void btnAdicionar_Click(object sender, EventArgs e)
         {
@@ -538,10 +446,200 @@ namespace AutoEcac
             this.Close();
         }
 
+        private void cbxBancoDados_Click(object sender, EventArgs e)
+        {
+            if (cbxBancoDados.Enabled)
+            {
+                //rbConsultaDI.Checked = true;
+                rdbNrDeclaracao.Checked = true;
+
+                dgvNrDelacaracao.Enabled = true; // rdbNrDeclaracao.Checked;
+
+                btnAdicionar.Enabled = false;
+                edtNrConsultaDI.Enabled = false;
+                btnServico.Enabled = true;
+
+                grpDatas.Enabled = false;
+
+                if (!grpDatas.Enabled)
+                {
+                    dtpInicial.Value = DateTime.Now;
+                    dtpFinal.Value = DateTime.Now;
+                    cbxperiodo.SelectedIndex = (int)Periodo.DIARIO;
+                    grpDatas.Enabled = false;
+                }
+            }
+            else
+            {
+                dgvNrDelacaracao.Enabled = true; // rdbNrDeclaracao.Checked;
+                btnAdicionar.Enabled = true;
+                edtNrConsultaDI.Enabled = true;
+                btnServico.Enabled = false;
+
+
+                grpDatas.Enabled = true;
+
+                if (!grpDatas.Enabled)
+                {
+                    dtpInicial.Value = DateTime.Now;
+                    dtpFinal.Value = DateTime.Now;
+                    cbxperiodo.SelectedIndex = (int)Periodo.DIARIO;
+                    grpDatas.Enabled = false;
+                }
+
+            }
+        }
+
         #endregion
 
         #region Outros Eventos
 
+        public frmAutoEcac()
+        {
+            InitializeComponent();
+            //btnServico.Enabled = false;
+            //cbxBancoDados.Checked = false;
+            //Browser = ConfigurarBrowser();
+            LimpaServicos();
+        }
+
+        private void LimpaServicos()
+        {
+            _extratoService = null;
+            _darfService = null;
+            db = null;
+        }
+
+        private void IniciarOperacao()
+        {
+            LimpaServicos();
+
+            if (TipoServicoSelecionado == TipoServico.DARF)
+            {
+                _darfService = new DARFService(Browser)
+                {
+                    _tipoServicoSelecionado = TipoServico.DARF,
+                    _CNPJ = edtCNPJ.Text.Trim()
+                };
+
+                _darfService.AbrirBrowser();
+
+            }
+            else if (TipoServicoSelecionado == TipoServico.EXTRATO)
+            {
+                db = new roboEntities();
+                _extratoService = new ExtratoService(Browser, db)
+                {
+                    _tipoServicoSelecionado = TipoServico.EXTRATO,
+                    _tipoExtratoSelecionado = TipoExtratoSelecionado,
+                    _CNPJ = edtCNPJ.Text.Trim()
+                };
+                //_extratoService.AbrirBrowser();
+            }
+            else
+            {
+                MessageBox.Show("Serviço não implementado.");
+                return;
+            }
+
+            Thread.Sleep(2000);
+        }
+
+        private void FinalizarOperacao()
+        {
+            LimpaServicos();
+            Browser.Quit();
+            Browser.Dispose();
+            Browser = null;
+            Thread.Sleep(2000);
+        }
+
+        private bool AlterarPerfil()
+        {
+            if (TipoServicoSelecionado == TipoServico.DARF && !string.IsNullOrEmpty(edtCNPJ.Text))
+            {
+                Browser.FindElement(By.Id("btnPerfil")).Click();
+                Thread.Sleep(2000);
+
+                Browser.FindElement(By.Id("txtNIPapel2")).SendKeys(edtCNPJ.Text);
+                Browser.FindElement(By.XPath("//input[contains(@onclick,'formPJ')]")).Click();
+                Thread.Sleep(2000);
+
+                if (Browser.FindElement(By.ClassName("erro")).Text.Contains("ATENÇÃO"))
+                {
+                    MessageBox.Show("Seu Browser irá reiniciar. Verifique sua procuração eletrônica!", "Auto-Ecac", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    Browser.FindElement(By.ClassName("ui-icon-closethick")).Click();
+                    Browser.FindElement(By.Id("sairSeguranca")).Click();
+                    return false;
+                }
+                else
+                {
+                    return true;
+                }
+            }
+            else if (TipoServicoSelecionado == TipoServico.EXTRATO && !rdbNrDeclaracao.Checked && string.IsNullOrEmpty(edtNrConsultaDI.Text.Trim()))
+            {
+                MessageBox.Show("Campo Nº Obrigatório", "Auto-Siscomex Importacao", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+        }
+
+        private Boolean ValidarCampos()
+        {
+            if ((TipoServicoSelecionado == TipoServico.EXTRATO) && ((dtpInicial.Value == null) || (dtpFinal.Value == null)) && !rdbNrDeclaracao.Checked)
+            {
+                MessageBox.Show("Data inicial e Final de consulta obrigatória.", "Auto-Siscomex", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
+            }
+
+            if (TipoServicoSelecionado == TipoServico.NENHUM)
+            {
+                MessageBox.Show("Selecione um serviço AutoEcac", "Auto-Ecac", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
+            }
+            else if (PeriodoSelecionado == Periodo.NENHUM)
+            {
+                MessageBox.Show("Selecione a periodicidade de consulta e armazenamento", "Auto-Ecac", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+        }
+
+        private ChromeDriver ConfigurarBrowser()
+        {
+            var service = ChromeDriverService.CreateDefaultService();
+            service.HideCommandPromptWindow = true;
+
+            var options = new ChromeOptions();
+            options.AddArguments("disable-infobars");
+            options.AddArgument("--safebrowsing-disable-download-protection");
+            //options.AddArguments($"user-data-dir=C:/Users/{Environment.UserName}/AppData/Local/Google/Chrome/User Data/Default");
+            options.AddUserProfilePreference("download.prompt_for_download", false);
+            options.AddUserProfilePreference("download.directory_upgrade", true);
+            options.AddUserProfilePreference("safebrowsing.enabled", true);
+            //options.LeaveBrowserRunning = true;
+            //options.AcceptInsecureCertificates = true;
+            return new ChromeDriver(service, options);
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.GetCultureInfo("en-US");
+            //Browser = ConfigurarBrowser();
+            cbxServico.SelectedIndex = 0;
+            cbxperiodo.SelectedIndex = 0;
+            rdbNrDeclaracao.PerformClick();
+            rbConsultaDI.Checked = true;
+            rbConsultaLI_Click(sender, e);
+
+        }
         private void cbxServico_SelectedIndexChanged(object sender, EventArgs e)
         {
             cbxperiodo.Items.Clear();
@@ -624,86 +722,12 @@ namespace AutoEcac
         }
 
         public string URL_EXTRATO_LOGIN { get; private set; }
+
         public string URL_EXTRATO_DECLARACAO_LI { get; private set; }
 
         #endregion
 
-        private void cbxBancoDados_Click(object sender, EventArgs e)
-        {
-            if (cbxBancoDados.Enabled)
-            {
-                //rbConsultaDI.Checked = true;
-                rdbNrDeclaracao.Checked = true;
-
-                dgvNrDelacaracao.Enabled = true; // rdbNrDeclaracao.Checked;
-
-                btnAdicionar.Enabled = false;
-                edtNrConsultaDI.Enabled = false;
-                btnServico.Enabled = true;
-
-                grpDatas.Enabled = false;
-
-                if (!grpDatas.Enabled)
-                {
-                    dtpInicial.Value = DateTime.Now;
-                    dtpFinal.Value = DateTime.Now;
-                    cbxperiodo.SelectedIndex = (int)Periodo.DIARIO;
-                    grpDatas.Enabled = false;
-                }
-            }
-            else
-            {
-                dgvNrDelacaracao.Enabled = true; // rdbNrDeclaracao.Checked;
-                btnAdicionar.Enabled = true;
-                edtNrConsultaDI.Enabled = true;
-                btnServico.Enabled = false;
-
-
-                grpDatas.Enabled = true;
-
-                if (!grpDatas.Enabled)
-                {
-                    dtpInicial.Value = DateTime.Now;
-                    dtpFinal.Value = DateTime.Now;
-                    cbxperiodo.SelectedIndex = (int)Periodo.DIARIO;
-                    grpDatas.Enabled = false;
-                }
-
-            }
-        }
-
-        private void btnServico_Click(object sender, EventArgs e)
-        {
-            if (Helper.ChecarConexaoInternet())
-            {
-                if (rbConsultaLI.Checked)
-                {
-                    tempoLI.Enabled = true;
-                    tempoLI.Interval = rdbMinutos.Checked ? (int)TimeSpan.FromMinutes(Convert.ToInt32(numericUpDown1.Value)).TotalMilliseconds : (int)TimeSpan.FromHours(Convert.ToInt32(numericUpDown1.Value)).TotalMilliseconds;
-                    tempoLI_Tick(sender, null);
-
-                }
-                else if (rbConsultaDI.Checked)
-                {
-                    tempoDI.Enabled = true;
-                    tempoDI.Interval = rdbMinutos.Checked ? (int)TimeSpan.FromMinutes(Convert.ToInt32(numericUpDown1.Value)).TotalMilliseconds : (int)TimeSpan.FromHours(Convert.ToInt32(numericUpDown1.Value)).TotalMilliseconds;
-                    tempoDI_Tick(sender, null);
-                }
-                else
-                {
-                    tempoLiLote.Enabled = true;
-                    tempoLI.Interval = (int)TimeSpan.FromMinutes(1).TotalMilliseconds;
-                    tempoLiLote_Tick(sender, null);
-
-                }
-            }
-            else
-            {
-                MessageBox.Show("Sem conexão com a Internet!");
-
-            }
-
-        }
+        #region Eventos Tick
 
         private void tempoDI_Tick(object sender, EventArgs e)
         {
@@ -741,31 +765,7 @@ namespace AutoEcac
 
         }
 
-        private void rbConsultaLI_Click(object sender, EventArgs e)
-        {
-            grbPeriodocidadeLI.Enabled = rbConsultaLILote.Checked;
-            dtpLi.Enabled = rbConsultaLILote.Checked;
-            btnAddTempo.Enabled = rbConsultaLILote.Checked;
-
-
-            dgvHoraLI.Enabled = rbConsultaLILote.Checked;
-            dgvHoraLI.BackgroundColor = rbConsultaLILote.Checked ? Color.LightYellow : Color.LightGray;
-
-            qtdArqLote.Enabled = rbConsultaLILote.Checked;
-            lblArqLote.Enabled = rbConsultaLILote.Checked;
-
-            grbTempo.Enabled = rbConsultaDI.Checked || rbConsultaLI.Checked;
-            rdbHora.Enabled = rbConsultaDI.Checked || rbConsultaLI.Checked;
-            rdbMinutos.Enabled = rbConsultaDI.Checked || rbConsultaLI.Checked;
-
-        }
-
-        private void btnAddTempo_Click(object sender, EventArgs e)
-        {
-            dgvHoraLI.Rows.Add(dtpLi.Value.ToShortTimeString().ToString());
-
-        }
-
+        #endregion
 
     }
 }

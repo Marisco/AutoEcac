@@ -33,13 +33,20 @@ namespace AutoEcac.model
         }
 
 		public MultipartFormDataContent getFormContent()
-		{            
+		{
 
-
+            //var fileToUploadContent = new ByteArrayContent(fileToUpload);
+            //fileToUploadContent.Headers.ContentType = MediaTypeHeaderValue.Parse("text/xml");
             var fileToUploadContent = new ByteArrayContent(fileToUpload, 0, fileToUpload.Length);
-			fileToUploadContent.Headers.Add("content-type", "application/" + headerValue);
-            
-            
+            if ( headerValue != "pdf")
+            {
+                fileToUploadContent.Headers.Add("content-type", "application/" + headerValue);
+            }
+            else
+            {
+              fileToUploadContent.Headers.ContentType = MediaTypeHeaderValue.Parse("text/pdf");
+            }
+
             return new MultipartFormDataContent
 			{
 				{ fileToUploadContent, "file", fileName},

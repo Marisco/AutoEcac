@@ -14,11 +14,9 @@ namespace AutoEcac
 {
     public class KestraaUpload
     {
-
-
         private HttpClient client = new HttpClient();
 		private readonly string urlBase = "https://kestraaintegration-dev.cfapps.us10.hana.ondemand.com/file/upload/ImportDeclaration/";
-
+        
         // instanciar a classe para chamar o servico
         //kestraaUpload enviarAquivo = new kestraaUpload();
         //envio.enviarArquivosws();
@@ -40,7 +38,6 @@ namespace AutoEcac
         //issueDate:data de hoje
         //userId:99999999
 
-
         public async void enviarArquivosws(KestraaUploadRequest requestData, Int64 ?nrProcesso)
         {
             
@@ -57,8 +54,8 @@ namespace AutoEcac
 			}   
 
            
-            //HttpResponseMessage response = await client.PostAsync(nrProcesso.ToString(), requestData.getFormContent());
-            //string contents = await response.Content.ReadAsStringAsync();
+            HttpResponseMessage response = await client.PostAsync(nrProcesso.ToString(), requestData.getFormContent());
+            string contents = await response.Content.ReadAsStringAsync();
 
             //Console.Write(response.StatusCode);
         }
