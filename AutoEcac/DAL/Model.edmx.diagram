@@ -4,7 +4,7 @@
   <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
-      <Diagram DiagramId="a9425d1c8cca4a08ba9dd5b2e8fe40cb" Name="Diagram1">
+      <Diagram DiagramId="a9425d1c8cca4a08ba9dd5b2e8fe40cb" Name="Diagram1" ZoomLevel="87">
         <EntityTypeShape EntityType="roboModel.tsiscomexweb_robo" Width="1.5" PointX="0.625" PointY="0.625" IsExpanded="true" />
       </Diagram>
     </edmx:Diagrams>

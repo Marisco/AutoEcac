@@ -912,8 +912,8 @@ namespace AutoEcac.Servicos
                 pRegistro.in_rodando = 0;
 
                 var arquivoXml = System.IO.File.ReadAllBytes(this.DiretorioCompleto + "\\" + pNumerorDi + "_situacao.xml");
-                KestraaUploadRequest uploadRequest = new KestraaUploadRequest(pNumerorDi + "_situacao.xml", arquivoXml, "Other",
-                            "NUMERODI - XML Comando",
+                KestraaUploadRequest uploadRequest = new KestraaUploadRequest(pNumerorDi + "_situacao.xml", arquivoXml, "Clearance DI File",
+                             pNumerorDi,
                             DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss"),
                             "99999999", "xml");
 

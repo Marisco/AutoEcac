@@ -57,10 +57,10 @@ namespace AutoEcac
 			}   
 
            
-            HttpResponseMessage response = await client.PostAsync(nrProcesso.ToString(), requestData.getFormContent());
-            string contents = await response.Content.ReadAsStringAsync();
+            //HttpResponseMessage response = await client.PostAsync(nrProcesso.ToString(), requestData.getFormContent());
+            //string contents = await response.Content.ReadAsStringAsync();
 
-            Console.Write(response.StatusCode);
+            //Console.Write(response.StatusCode);
         }
 
 		
