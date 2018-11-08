@@ -591,9 +591,10 @@ namespace AutoEcac.Servicos
                         base._consultaAtual = numero;
                         int nrRegistroDi = Int32.Parse(numero);
                         tsiscomexweb_robo registro = _db.tsiscomexweb_robo.OrderByDescending(reg => reg.nr_sequencia).Where(reg => reg.nr_registro == nrRegistroDi).OrderByDescending(reg => reg.nr_sequencia).First();
-
+                        Thread.Sleep(2000);
                         switch ((int)pTipoConsultaExtrato)
                         {
+                            
                             case (int)TipoConsultaExtrato.NumeroDeclaracao:
                                 _browser.FindElement(By.Name("nrDeclaracao")).Clear();
                                 _browser.FindElement(By.Name("nrDeclaracao")).SendKeys(numero);
