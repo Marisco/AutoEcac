@@ -15,7 +15,7 @@ namespace AutoEcac
     public class KestraaUpload
     {
         private HttpClient client = new HttpClient();
-		private readonly string urlBase = "https://kestraaintegration-dev.cfapps.us10.hana.ondemand.com/file/upload/ImportDeclaration/";
+		private string urlBase = "https://kestraaintegration-dev.cfapps.us10.hana.ondemand.com/file/upload/ImportDeclaration/";
         
         // instanciar a classe para chamar o servico
         //kestraaUpload enviarAquivo = new kestraaUpload();
@@ -48,14 +48,14 @@ namespace AutoEcac
                 client.DefaultRequestHeaders.Add("Authorization", "Apikey 247fd8c6-d87a-4ddd-9a36-b21dd6809cfd");
                 client.DefaultRequestHeaders.Add("Origin", "https://kestraa.com");                
 
-            } catch(Exception e)
+            } catch(Exception )
 			{
 				//ja possui o header
 			}   
 
            
-            HttpResponseMessage response = await client.PostAsync(nrProcesso.ToString(), requestData.getFormContent());
-            string contents = await response.Content.ReadAsStringAsync();
+            //HttpResponseMessage response = await client.PostAsync(nrProcesso.ToString(), requestData.getFormContent());
+            //string contents = await response.Content.ReadAsStringAsync();
 
             //Console.Write(response.StatusCode);
         }

@@ -108,7 +108,7 @@ namespace AutoEcac.Services
             }
         }
 
-        protected void LogarErros(string e)
+        public void LogarErros(string e)
         {
             if (!System.IO.File.Exists(this.DiretorioCompleto + @"\" + "LogErro.txt"))
             {

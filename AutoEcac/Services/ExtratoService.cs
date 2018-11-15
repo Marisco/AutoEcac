@@ -175,10 +175,10 @@ namespace AutoEcac.Servicos
             }
             else
             {
-                
+
                 pRegistro.in_desembaraco = OrgaoAnuenteAtual.Contains("DESEMBARAÇADA") ? 1 : 0;
                 pRegistro.xml_retorno = xmlLiCompleta.OuterXml;
-                
+
             }
 
 
@@ -310,7 +310,7 @@ namespace AutoEcac.Servicos
 
                             NavegarURLExtratoDeclaracaoLI();
 
-                            Thread.Sleep(1000);                            
+                            Thread.Sleep(1000);
                             AtualizarLI(this.DiretorioCompleto + "\\" + _NmArquivoNovo, ref registro);
                             _db.SaveChanges();
 
@@ -348,12 +348,12 @@ namespace AutoEcac.Servicos
             }
             catch (Exception e)
             {
-                
-                LogarErros(DateTime.Now.ToString() + " Consulta Antual: " + _consultaAtual + " Consulta Anterior: " + _consultaAnterior + "Msg: " + e.Message);
+
+                LogarErros(DateTime.Now.ToString() + " Consulta Atual: " + _consultaAtual + " Consulta Anterior: " + _consultaAnterior + "Msg: " + e.Message);
 
             }
         }
-        
+
         public void ConsultarLILote(Periodo pPeriodo, TipoConsultaExtrato pTipoConsultaExtrato, List<string> pNrConsulta, DateTime pDtInicial, DateTime pDtFinal, int pQtdEmLote)
         {
             try
@@ -435,7 +435,7 @@ namespace AutoEcac.Servicos
                         catch (Exception e)
                         {
                             string msg = DateTime.Now.ToString() + " Erro: Consulta Atual: " + _consultaAtual + " Consulta Anterior: " + _consultaAnterior + " Msg: " + e.Message;
-                            _db.SaveChanges();                            
+                            _db.SaveChanges();
                             LogarErros(msg);
                             Thread.Sleep(1000);
                             try
@@ -462,7 +462,7 @@ namespace AutoEcac.Servicos
             catch (Exception e)
             {
 
-                LogarErros(DateTime.Now.ToString() + " Consulta Antual: " + _consultaAtual + " Consulta Anterior: " + _consultaAnterior + "Msg: " + e.Message);
+                LogarErros(DateTime.Now.ToString() + " Consulta Atual: " + _consultaAtual + " Consulta Anterior: " + _consultaAnterior + "Msg: " + e.Message);
 
             }
         }
@@ -481,7 +481,7 @@ namespace AutoEcac.Servicos
                 novoXmlLiCompleta.InnerXml = xmlLiCompleta.OuterXml;
 
 
-                
+
 
 
                 foreach (XmlNode liCompleta in listaLiCompleta)
@@ -519,7 +519,7 @@ namespace AutoEcac.Servicos
             {
                 registro.tx_erro = e.Message;
                 registro.in_rodando = 1;
-                LogarErros(DateTime.Now.ToString() + " Consulta Antual: " + _consultaAtual + " Consulta Anterior: " + _consultaAnterior + "Msg: " + e.Message);
+                LogarErros(DateTime.Now.ToString() + " Consulta Atual: " + _consultaAtual + " Consulta Anterior: " + _consultaAnterior + "Msg: " + e.Message);
                 _db.SaveChanges();
             }
         }
@@ -551,7 +551,7 @@ namespace AutoEcac.Servicos
                     }
                     catch (Exception e)
                     {
-                        LogarErros(DateTime.Now.ToString() + " Consulta Antual: " + _consultaAtual + " Consulta Anterior: " + _consultaAnterior + "Msg: " + e.Message);
+                        LogarErros(DateTime.Now.ToString() + " Consulta Atual: " + _consultaAtual + " Consulta Anterior: " + _consultaAnterior + "Msg: " + e.Message);
                     }
                 }
 
@@ -564,13 +564,13 @@ namespace AutoEcac.Servicos
                 Thread.Sleep(1000);
                 try
                 {
-                    LogarErros(DateTime.Now.ToString() + " Consulta Antual: " + _consultaAtual + " Consulta Anterior: " + _consultaAnterior + "Msg: " + e.Message);
+                    LogarErros(DateTime.Now.ToString() + " Consulta Atual: " + _consultaAtual + " Consulta Anterior: " + _consultaAnterior + "Msg: " + e.Message);
                     _browser.SwitchTo().Alert().Accept();
 
                 }
                 catch (Exception ex)
                 {
-                    LogarErros(DateTime.Now.ToString() + " Consulta Antual: " + _consultaAtual + " Consulta Anterior: " + _consultaAnterior + "Msg: " + ex.Message);
+                    LogarErros(DateTime.Now.ToString() + " Consulta Atual: " + _consultaAtual + " Consulta Anterior: " + _consultaAnterior + "Msg: " + ex.Message);
                 }
             }
             return vListaLi;
@@ -591,12 +591,15 @@ namespace AutoEcac.Servicos
                         base._consultaAtual = numero;
                         int nrRegistroDi = Int32.Parse(numero);
                         tsiscomexweb_robo registro = _db.tsiscomexweb_robo.OrderByDescending(reg => reg.nr_sequencia).Where(reg => reg.nr_registro == nrRegistroDi).OrderByDescending(reg => reg.nr_sequencia).First();
+                        registro.in_rodando = 0;
+                        _db.SaveChanges();
                         Thread.Sleep(2000);
                         switch ((int)pTipoConsultaExtrato)
                         {
-                            
+
                             case (int)TipoConsultaExtrato.NumeroDeclaracao:
-                                _browser.FindElement(By.Name("nrDeclaracao")).Clear();
+                                _browser.FindElement(By.Name("nrDeclaracao")).SendKeys(Keys.Delete);
+                                Thread.Sleep(500);
                                 _browser.FindElement(By.Name("nrDeclaracao")).SendKeys(numero);
                                 break;
                             case (int)TipoConsultaExtrato.CnpjImportador:
@@ -715,7 +718,7 @@ namespace AutoEcac.Servicos
                         }
                         catch (Exception e)
                         {
-                            string msg = DateTime.Now.ToString() + " Consulta Antual: " + _consultaAtual + " Consulta Anterior: " + _consultaAnterior + "Msg: " + e.Message;
+                            string msg = DateTime.Now.ToString() + " Consulta Atual: " + _consultaAtual + " Consulta Anterior: " + _consultaAnterior + "Msg: " + e.Message;
                             registro.tx_erro = msg;
                             registro.in_rodando = 1;
                             _db.SaveChanges();
@@ -740,7 +743,7 @@ namespace AutoEcac.Servicos
             }
             catch (Exception e)
             {
-                LogarErros(DateTime.Now.ToString() + " Consulta Antual: " + _consultaAtual + " Consulta Anterior: " + _consultaAnterior + "Msg: " + e.Message);
+                LogarErros(DateTime.Now.ToString() + " Consulta Atual: " + _consultaAtual + " Consulta Anterior: " + _consultaAnterior + "Msg: " + e.Message);
 
             }
             pNrConsulta.Clear();
@@ -1108,12 +1111,16 @@ namespace AutoEcac.Servicos
             try
             {
                 _browser.Navigate().GoToUrl(URL_EXTRATO_LOGIN);
-                _browser.FindElement(By.XPath("//img[contains(@src,'certificado')]")).Click();
+                var wait = new WebDriverWait(_browser, TimeSpan.FromSeconds(25));
+                var element = _browser.FindElement(By.XPath("//img[contains(@src,'certificado')]"));
+                wait.Until(ExpectedConditions.ElementToBeClickable(element));
+                element.Click();
 
             }
             catch (Exception e)
             {
-                LogarErros(DateTime.Now.ToString() + " Erro no login a tela não estava em foco ou demorou muito para carregar Msg:" + e.Message);
+                throw new Exception("Erro no Login: Houve Timeout ou a tela estava fora de foco:" + e.Message);
+                //LogarErros(DateTime.Now.ToString() + " Erro no login a tela não estava em foco ou demorou muito para carregar Msg:" + );
 
             }
 
@@ -1123,12 +1130,13 @@ namespace AutoEcac.Servicos
         public void SetarCertificado(int qtdSetas)
         {
             Thread.Sleep(30000);
-            for (int i = 0; i <= qtdSetas; i++)
+            for (int i = 0; i < qtdSetas; i++)
             {
+                Thread.Sleep(500);
                 System.Windows.Forms.SendKeys.SendWait(@"{DOWN}");
             }
-
-            System.Windows.Forms.SendKeys.SendWait(@"{Enter}");
+            Thread.Sleep(500);
+            System.Windows.Forms.SendKeys.SendWait(@"{ENTER}");
         }
     }
 }

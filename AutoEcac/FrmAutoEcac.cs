@@ -26,6 +26,7 @@ using AutoEcac.model;
 using System.Globalization;
 using System.Drawing;
 
+
 namespace AutoEcac
 {
     public partial class frmAutoEcac : Form
@@ -35,7 +36,7 @@ namespace AutoEcac
         private string fCdReceita;
         protected IWebDriver Browser;
         protected roboEntities db;
-        ExtratoService _extratoRodando = new ExtratoService();        
+        ExtratoService _extratoRodando = new ExtratoService();
 
         #region Eventos Clicks
 
@@ -66,8 +67,6 @@ namespace AutoEcac
             }
             else if (TipoServicoSelecionado == TipoServico.EXTRATO)
             {
-
-
                 List<string> vListaNrConsulta = new List<string>();
                 List<string> vListaCpf = new List<string>();
                 List<string> vListaDiLi = new List<string>();
@@ -78,22 +77,34 @@ namespace AutoEcac
                     {
                         if (cbxBancoDados.Checked)
                         {
-                            foreach (var row in db.tsiscomexweb_robo.Where(reg => reg.tp_consulta == "DI" && reg.in_rodando == 1 && reg.in_desembaraco == 0))
+                            try
                             {
-                                row.in_rodando = 0;
-
-                                if (row.tp_acao == "consulta" || (row.tp_acao == "acompanha" && row.dt_agendamento <= DateTime.Now))
+                                foreach (var row in db.tsiscomexweb_robo.Where(reg => reg.tp_consulta == "DI" && reg.in_rodando == 1 && reg.in_desembaraco == 0))
                                 {
-                                    vListaNrConsulta.Add(row.nr_registro.ToString().Trim() + "; " + row.cpf_certificado.ToString().Trim());
+                                    // row.in_rodando = 0;
 
-                                    if (!vListaCpf.Contains(row.cpf_certificado.ToString().Trim()))
+                                    if (row.tp_acao == "consulta" || (row.tp_acao == "acompanha" && row.dt_agendamento <= DateTime.Now))
                                     {
-                                        vListaCpf.Add(row.cpf_certificado.ToString().Trim());
-                                    }
+                                        vListaNrConsulta.Add(row.nr_registro.ToString().Trim() + "; " + row.cpf_certificado.ToString().Trim());
 
+                                        if (!vListaCpf.Contains(row.cpf_certificado.ToString().Trim()))
+                                        {
+                                            vListaCpf.Add(row.cpf_certificado.ToString().Trim());
+                                        }
+
+                                    }
                                 }
+                                // db.SaveChanges();
+
                             }
-                            db.SaveChanges();
+                            catch (Exception ex)
+                            {
+                                db.Dispose();
+                                string msg = DateTime.Now.ToString() + " Erro ao buscar registros na base de dados Msg: " + ex.Message;
+                                _extratoService.LogarErros(msg);
+                                Thread.Sleep(1000);
+                            }
+
                         }
                         else
                         {
@@ -118,42 +129,101 @@ namespace AutoEcac
                     {
                         var store = new X509Store(StoreLocation.CurrentUser);
                         store.Open(OpenFlags.ReadOnly);
-                        var certificados = store.Certificates.OfType<X509Certificate2>().Where(x => x.Issuer.Contains("Secretaria da Receita Federal do Brasil")).OrderBy(x => x.Subject);
+                        var certificados = store.Certificates.OfType<X509Certificate2>().Where(x => x.Issuer.Contains("RFB")).OrderByDescending(x => x.NotAfter);
 
-                        int qtdSetas = 0;
+
                         foreach (string cpf in vListaCpf)
                         {
                             int i = 0;
+                            int qtdSetas = 0;
+                            bool encontrouCertificado = false;
                             foreach (var certificado in certificados)
                             {
-                                if (certificado.FriendlyName.Contains(cpf))
+                                if (certificado.Subject.ToString().Contains(cpf))
                                 {
-                                    qtdSetas = i++;
+                                    qtdSetas = i;
+                                    encontrouCertificado = true;
 
                                 }
                                 i++;
                             }
 
-                            Thread tSeta = new Thread(() => _extratoService.SetarCertificado(qtdSetas));
-                            tSeta.Start();
-                            _extratoService.AbrirBrowser();
-                            _extratoService.NavegarURLExtratoDeclaracaoDI();
-                            Thread.Sleep(2000);
-                            foreach (string di in vListaNrConsulta)
+                            try
                             {
-                                if (cpf == di.ToString().Split(';')[1].Trim())
+                                vListaDiLi.Clear();
+                                foreach (string di in vListaNrConsulta)
                                 {
-                                    vListaDiLi.Add(di.ToString().Split(';')[0]);
+                                    if (cpf == di.ToString().Split(';')[1].Trim())
+                                    {
+                                        vListaDiLi.Add(di.ToString().Split(';')[0]);
+                                    }
                                 }
+                                if (encontrouCertificado)
+                                {
+                                    Thread tSeta = new Thread(() => _extratoService.SetarCertificado(qtdSetas));
+                                    tSeta.Start();
+                                    _extratoService.AbrirBrowser();
+
+                                    if (Browser.PageSource.Contains("Falha de Acesso"))
+                                    {
+                                        throw new Exception("Certficado sem premissão");
+                                    }
+                                    _extratoService.NavegarURLExtratoDeclaracaoDI();
+
+                                    Thread.Sleep(2000);
+                                    Periodo periodo = PeriodoSelecionado;
+                                    if (_extratoService != null)
+                                    {
+                                        _extratoService.ConsultarDI(periodo, TipoConsultaExtratoSelecionado, vListaDiLi, dtpInicial.Value, dtpFinal.Value);
+                                        Thread.Sleep(1000);
+                                        FinalizarOperacao();
+                                        Thread.Sleep(1000);
+                                        Browser = ConfigurarBrowser();
+                                        Thread.Sleep(1000);
+                                        IniciarOperacao();
+
+                                    }
+
+                                }
+                                else
+                                {
+                                    throw new Exception("Certficado não encontrado");
+                                }
+
                             }
-                            Periodo periodo = PeriodoSelecionado;
-                            Thread t = new Thread(() => _extratoService.ConsultarDI(periodo, TipoConsultaExtratoSelecionado, vListaDiLi, dtpInicial.Value, dtpFinal.Value));
-                            t.Start();
-                        }
+
+                            catch (Exception exc)
+                            {
+                                string msg = DateTime.Now.ToString() + " Erro no Login: " + exc.Message;
+
+                                foreach (var row in db.tsiscomexweb_robo.Where(
+                                    reg => vListaDiLi.Any(di => di == reg.nr_registro.ToString()) &&
+                                    reg.tp_consulta == "DI" &&
+                                    reg.in_rodando == 1 &&
+                                    reg.in_desembaraco == 0
+                                    ))
+                                {
+                                    row.in_rodando = exc.Message.Contains("Timeout") ? 1 : 0;
+                                    row.nr_tentativas = row.nr_tentativas + 1;
+                                    row.tx_erro = msg;
+                                    //vListaDiLi.Remove(row.nr_registro.ToString());
+                                }
+                                db.SaveChanges();
+                                _extratoService.LogarErros(msg);
+                                Thread.Sleep(1000);
+                                FinalizarOperacao();
+                                Thread.Sleep(1000);
+                                Browser = ConfigurarBrowser();
+                                Thread.Sleep(1000);
+                                IniciarOperacao();
+                            }
+
+                        }                        
+                        Thread.Sleep(1000);                        
                     }
                     else
                     {
-                        FinalizarOperacao();
+                       FinalizarOperacao();                       
                     }
 
 
@@ -169,7 +239,7 @@ namespace AutoEcac
 
                             foreach (var row in selecaoLI)
                             {
-                                row.in_rodando = 0;
+                                //row.in_rodando = 0;
 
                                 vListaNrConsulta.Add(row.nr_registro.ToString().Trim() + "; " + row.cpf_certificado.ToString().Trim());
 
@@ -178,7 +248,7 @@ namespace AutoEcac
                                     vListaCpf.Add(row.cpf_certificado.ToString().Trim());
                                 }
                             }
-                            db.SaveChanges();
+                            //db.SaveChanges();
                         }
 
                         if (!string.IsNullOrEmpty(edtNrConsultaDI.Text.Trim()))
@@ -300,7 +370,7 @@ namespace AutoEcac
                             {
                                 if (certificado.FriendlyName.Contains(cpf))
                                 {
-                                    qtdSetas = i++;
+                                    qtdSetas = i;
 
                                 }
                                 i++;
@@ -548,9 +618,14 @@ namespace AutoEcac
         private void FinalizarOperacao()
         {
             LimpaServicos();
-            Browser.Quit();
-            Browser.Dispose();
-            Browser = null;
+            if (Browser != null)
+            {
+                Browser.Quit();
+                Browser.Dispose();
+                Browser = null;
+
+            }
+            
             Thread.Sleep(2000);
         }
 
@@ -731,10 +806,14 @@ namespace AutoEcac
 
         private void tempoDI_Tick(object sender, EventArgs e)
         {
-            //rbConsultaDI.Checked = true;
-            cbxBancoDados.Checked = true;
-            panel3_MouseClick(sender, null);
-            btnOK_Click(sender, e);
+            if (Browser == null)
+            {
+                //rbConsultaDI.Checked = true;
+                cbxBancoDados.Checked = true;
+                panel3_MouseClick(sender, null);
+                btnOK_Click(sender, e);
+                FinalizarOperacao();
+            }
 
         }
 
