@@ -654,13 +654,13 @@ namespace AutoEcac.Servicos
 
                             registro.xml_retorno = arquivo;
 
-                            var arquivoXml = System.IO.File.ReadAllBytes(this.DiretorioCompleto + "\\" + _NmArquivoNovo);
-                            KestraaUploadRequest uploadRequest = new KestraaUploadRequest(_NmArquivoNovo, arquivoXml, "Import Declaration - DI",
-                                numero,
-                                DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss"),
-                                "99999999", "xml");
+                            //var arquivoXml = System.IO.File.ReadAllBytes(this.DiretorioCompleto + "\\" + _NmArquivoNovo);
+                            //KestraaUploadRequest uploadRequest = new KestraaUploadRequest(_NmArquivoNovo, arquivoXml, "Import Declaration - DI",
+                            //    numero,
+                            //    DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss"),
+                            //    "99999999", "xml");
 
-                            _kestraaUpload.enviarArquivosws(uploadRequest, registro.nr_processo);
+                            //_kestraaUpload.enviarArquivosws(uploadRequest, registro.nr_processo);
 
                             //System.IO.File.Delete(this.DiretorioCompleto + "\\" + _NmArquivoNovo);
 
@@ -674,12 +674,12 @@ namespace AutoEcac.Servicos
                             var arquivoPdf = System.IO.File.ReadAllBytes(this.DiretorioCompleto + "\\" + _NmArquivoNovo);
                             registro.pdf_extrato = arquivoPdf;
 
-                            uploadRequest = new KestraaUploadRequest(_NmArquivoNovo, arquivoPdf, "Other",
-                                numero,
-                                DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss"),
-                                "99999999", "pdf");
+                            //uploadRequest = new KestraaUploadRequest(_NmArquivoNovo, arquivoPdf, "Other",
+                            //    numero,
+                            //    DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss"),
+                            //    "99999999", "pdf");
 
-                            _kestraaUpload.enviarArquivosws(uploadRequest, registro.nr_processo);
+                            //_kestraaUpload.enviarArquivosws(uploadRequest, registro.nr_processo);
                             //System.IO.File.Delete(this.DiretorioCompleto + "\\" + _NmArquivoNovo);
 
                             if (gerarXmlAcompanhamento(numero, ref registro))
@@ -697,12 +697,12 @@ namespace AutoEcac.Servicos
                                 arquivoPdf = System.IO.File.ReadAllBytes(this.DiretorioCompleto + "\\" + _NmArquivoNovo);
                                 registro.pdf_comprovante = arquivoPdf;
 
-                                uploadRequest = new KestraaUploadRequest(_NmArquivoNovo, arquivoPdf, "Other",
-                                    numero,
-                                    DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss"),
-                                    "99999999", "pdf");
+                                //uploadRequest = new KestraaUploadRequest(_NmArquivoNovo, arquivoPdf, "Other",
+                                //    numero,
+                                //    DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss"),
+                                //    "99999999", "pdf");
 
-                                _kestraaUpload.enviarArquivosws(uploadRequest, registro.nr_processo);
+                                //_kestraaUpload.enviarArquivosws(uploadRequest, registro.nr_processo);
                                 //System.IO.File.Delete(this.DiretorioCompleto + "\\" + _NmArquivoNovo);
 
 
@@ -860,13 +860,13 @@ namespace AutoEcac.Servicos
                 pRegistro.in_desembaraco = 0;
                 pRegistro.in_rodando = 0;
 
-                var arquivoXml = System.IO.File.ReadAllBytes(this.DiretorioCompleto + "\\" + pNumerorDi + "_situacao.xml");
-                KestraaUploadRequest uploadRequest = new KestraaUploadRequest(pNumerorDi + "_situacao.xml", arquivoXml, "Other",
-                            pNumerorDi,
-                            DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss"),
-                            "99999999", "xml");
+                //var arquivoXml = System.IO.File.ReadAllBytes(this.DiretorioCompleto + "\\" + pNumerorDi + "_situacao.xml");
+                //KestraaUploadRequest uploadRequest = new KestraaUploadRequest(pNumerorDi + "_situacao.xml", arquivoXml, "Other",
+                //            pNumerorDi,
+                //            DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss"),
+                //            "99999999", "xml");
 
-                _kestraaUpload.enviarArquivosws(uploadRequest, pRegistro.nr_processo);
+                //_kestraaUpload.enviarArquivosws(uploadRequest, pRegistro.nr_processo);
                 //System.IO.File.Delete(this.DiretorioCompleto + "\\" + pNumerorDi + "_situacao.xml");
 
                 if (pRegistro.tp_acao != "acompanha")
@@ -912,13 +912,13 @@ namespace AutoEcac.Servicos
                 pRegistro.in_desembaraco = 1;
                 pRegistro.in_rodando = 0;
 
-                var arquivoXml = System.IO.File.ReadAllBytes(this.DiretorioCompleto + "\\" + pNumerorDi + "_situacao.xml");
-                KestraaUploadRequest uploadRequest = new KestraaUploadRequest(pNumerorDi + "_situacao.xml", arquivoXml, "Clearance DI File",
-                             pNumerorDi,
-                            DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss"),
-                            "99999999", "xml");
+                //var arquivoXml = System.IO.File.ReadAllBytes(this.DiretorioCompleto + "\\" + pNumerorDi + "_situacao.xml");
+                //KestraaUploadRequest uploadRequest = new KestraaUploadRequest(pNumerorDi + "_situacao.xml", arquivoXml, "Clearance DI File",
+                //             pNumerorDi,
+                //            DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss"),
+                //            "99999999", "xml");
 
-                _kestraaUpload.enviarArquivosws(uploadRequest, pRegistro.nr_processo);
+                //_kestraaUpload.enviarArquivosws(uploadRequest, pRegistro.nr_processo);
                 //System.IO.File.Delete(this.DiretorioCompleto + "\\" + pNumerorDi + "_situacao.xml");
             }
 

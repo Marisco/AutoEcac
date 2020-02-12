@@ -11,7 +11,7 @@
     <Property Name="tp_consulta" Type="String" MaxLength="2" FixedLength="false" Unicode="false" Nullable="false" />
     <Property Name="tp_acao" Type="String" MaxLength="15" FixedLength="false" Unicode="false" Nullable="false" />
     <Property Name="dt_agendamento" Type="DateTime" Precision="3" />
-    <Property Name="dt_realizacao" Type="DateTime" Nullable="false" Precision="3" />
+    <Property Name="dt_realizacao" Type="DateTime" Precision="3" />
     <Property Name="dt_registro_di" Type="DateTime" Precision="3" />
     <Property Name="nr_tentativas" Type="Int32" Nullable="false" />
     <Property Name="tx_erro" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />

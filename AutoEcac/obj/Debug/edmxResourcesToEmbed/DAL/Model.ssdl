@@ -11,18 +11,18 @@
     <Property Name="tp_consulta" Type="varchar" MaxLength="2" Nullable="false" />
     <Property Name="tp_acao" Type="varchar" MaxLength="15" Nullable="false" />
     <Property Name="dt_agendamento" Type="datetime" />
-    <Property Name="dt_realizacao" Type="datetime" Nullable="false" />
+    <Property Name="dt_realizacao" Type="datetime" />
     <Property Name="dt_registro_di" Type="datetime" />
     <Property Name="nr_tentativas" Type="int" Nullable="false" />
-    <Property Name="tx_erro" Type="text" />
+    <Property Name="tx_erro" Type="varchar(max)" />
     <Property Name="cd_usuario" Type="int" />
     <Property Name="cpf_certificado" Type="varchar" MaxLength="11" Nullable="false" />
     <Property Name="in_rodando" Type="int" Nullable="false" />
     <Property Name="in_desembaraco" Type="int" />
     <Property Name="tp_anuencia" Type="varchar" MaxLength="256" />
     <Property Name="in_situacao" Type="int" />
-    <Property Name="xml_comando" Type="text" />
-    <Property Name="xml_retorno" Type="text" />
+    <Property Name="xml_comando" Type="varchar(max)" />
+    <Property Name="xml_retorno" Type="varchar(max)" />
     <Property Name="pdf_extrato" Type="varbinary(max)" />
     <Property Name="pdf_comprovante" Type="varbinary(max)" />
   </EntityType>

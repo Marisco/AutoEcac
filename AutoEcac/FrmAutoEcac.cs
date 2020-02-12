@@ -127,26 +127,26 @@ namespace AutoEcac
                     }
                     if (vListaCpf.Count() > 0)
                     {
-                        var store = new X509Store(StoreLocation.CurrentUser);
-                        store.Open(OpenFlags.ReadOnly);
-                        var certificados = store.Certificates.OfType<X509Certificate2>().Where(x => x.Issuer.Contains("RFB")).OrderByDescending(x => x.NotAfter);
+                        //var store = new X509Store(StoreLocation.CurrentUser);
+                        //store.Open(OpenFlags.ReadOnly);
+                        //var certificados = store.Certificates.OfType<X509Certificate2>().Where(x => x.Issuer.Contains("RFB")).OrderByDescending(x => x.NotAfter);
 
 
                         foreach (string cpf in vListaCpf)
                         {
-                            int i = 0;
-                            int qtdSetas = 0;
-                            bool encontrouCertificado = false;
-                            foreach (var certificado in certificados)
-                            {
-                                if (certificado.Subject.ToString().Contains(cpf))
-                                {
-                                    qtdSetas = i;
-                                    encontrouCertificado = true;
+                            //int i = 0;
+                            //int qtdSetas = 0;
+                            //bool encontrouCertificado = false;
+                            //foreach (var certificado in certificados)
+                            //{
+                            //    if (certificado.Subject.ToString().Contains(cpf))
+                            //    {
+                            //        qtdSetas = i;
+                            //        encontrouCertificado = true;
 
-                                }
-                                i++;
-                            }
+                            //    }
+                            //    i++;
+                            //}
 
                             try
                             {
@@ -158,10 +158,10 @@ namespace AutoEcac
                                         vListaDiLi.Add(di.ToString().Split(';')[0]);
                                     }
                                 }
-                                if (encontrouCertificado)
-                                {
-                                    Thread tSeta = new Thread(() => _extratoService.SetarCertificado(qtdSetas));
-                                    tSeta.Start();
+                                //if (encontrouCertificado)
+                                //{
+                                    //Thread tSeta = new Thread(() => _extratoService.SetarCertificado(qtdSetas));
+                                    //tSeta.Start();
                                     _extratoService.AbrirBrowser();
 
                                     if (Browser.PageSource.Contains("Falha de Acesso"))
@@ -184,16 +184,17 @@ namespace AutoEcac
 
                                     }
 
-                                }
-                                else
-                                {
-                                    throw new Exception("Certficado não encontrado");
-                                }
+                                //}
+                                //else
+                                //{
+                                //    throw new Exception("Certficado não encontrado");
+                                //}
 
                             }
 
                             catch (Exception exc)
                             {
+                                
                                 string msg = DateTime.Now.ToString() + " Erro no Login: " + exc.Message;
 
                                 foreach (var row in db.tsiscomexweb_robo.Where(
@@ -357,27 +358,27 @@ namespace AutoEcac
                     if (vListaCpf.Count() > 0)
                     {
 
-                        var store = new X509Store(StoreLocation.CurrentUser);
-                        store.Open(OpenFlags.ReadOnly);
-                        var certificados = store.Certificates.OfType<X509Certificate2>().Where(x => x.Issuer.Contains("Secretaria da Receita Federal do Brasil")).OrderBy(x => x.Subject);
+                        //var store = new X509Store(StoreLocation.CurrentUser);
+                        //store.Open(OpenFlags.ReadOnly);
+                        //var certificados = store.Certificates.OfType<X509Certificate2>().Where(x => x.Issuer.Contains("Secretaria da Receita Federal do Brasil")).OrderBy(x => x.Subject);
 
                         int qtdSetas = 0;
 
                         foreach (string cpf in vListaCpf)
                         {
-                            int i = 0;
-                            foreach (var certificado in certificados)
-                            {
-                                if (certificado.FriendlyName.Contains(cpf))
-                                {
-                                    qtdSetas = i;
+                            //int i = 0;
+                            //foreach (var certificado in certificados)
+                            //{
+                            //    if (certificado.FriendlyName.Contains(cpf))
+                            //    {
+                            //        qtdSetas = i;
 
-                                }
-                                i++;
-                            }
+                            //    }
+                            //    i++;
+                            //}
 
-                            Thread tSeta = new Thread(() => _extratoService.SetarCertificado(qtdSetas));
-                            tSeta.Start();
+                            //Thread tSeta = new Thread(() => _extratoService.SetarCertificado(qtdSetas));
+                            //tSeta.Start();
                             _extratoService.AbrirBrowser();
                             Thread.Sleep(2000);
                             _extratoService.NavegarURLExtratoDeclaracaoLI();
@@ -706,6 +707,16 @@ namespace AutoEcac
 
         private void Form1_Load(object sender, EventArgs e)
         {
+            //    var pdfFile = System.IO.File.ReadAllBytes("C:\\AutoEcac\\Arquivos\\EXTRATO\\DI\\1820659145_comprovante.pdf");
+            //    var uploadRequest = new KestraaUploadRequest("1820659145_comprovante.pdf", pdfFile, "Other",
+            //                   "1820659145",
+            //                   DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss"),
+            //                   "99999999", "pdf");
+            //    KestraaUpload _Upload = new KestraaUpload();
+
+            //    await _Upload.enviarArquivosws(uploadRequest, 1820659145);
+
+
             CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.GetCultureInfo("en-US");
             //Browser = ConfigurarBrowser();
             cbxServico.SelectedIndex = 0;

@@ -48,13 +48,13 @@ namespace AutoEcac
                 client.DefaultRequestHeaders.Add("Authorization", "Apikey 247fd8c6-d87a-4ddd-9a36-b21dd6809cfd");
                 client.DefaultRequestHeaders.Add("Origin", "https://kestraa.com");                
 
-            } catch(Exception )
+            } catch(Exception e)
 			{
 				//ja possui o header
 			}   
 
            
-            HttpResponseMessage response = await client.PostAsync(nrProcesso.ToString(), requestData.getFormContent());
+            //HttpResponseMessage response = await client.PostAsync(nrProcesso.ToString(), requestData.getFormContent());
             //string contents = await response.Content.ReadAsStringAsync();
 
             //Console.Write(response.StatusCode);

@@ -4,7 +4,7 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-      <Schema Namespace="roboModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+    <Schema Namespace="roboModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
         <EntityType Name="tsiscomexweb_robo">
           <Key>
             <PropertyRef Name="nr_sequencia" />
@@ -16,26 +16,25 @@
           <Property Name="tp_consulta" Type="varchar" MaxLength="2" Nullable="false" />
           <Property Name="tp_acao" Type="varchar" MaxLength="15" Nullable="false" />
           <Property Name="dt_agendamento" Type="datetime" />
-          <Property Name="dt_realizacao" Type="datetime" Nullable="false" />
+          <Property Name="dt_realizacao" Type="datetime" />
           <Property Name="dt_registro_di" Type="datetime" />
           <Property Name="nr_tentativas" Type="int" Nullable="false" />
-          <Property Name="tx_erro" Type="text" />
+          <Property Name="tx_erro" Type="varchar(max)" />
           <Property Name="cd_usuario" Type="int" />
           <Property Name="cpf_certificado" Type="varchar" MaxLength="11" Nullable="false" />
           <Property Name="in_rodando" Type="int" Nullable="false" />
           <Property Name="in_desembaraco" Type="int" />
           <Property Name="tp_anuencia" Type="varchar" MaxLength="256" />
           <Property Name="in_situacao" Type="int" />
-          <Property Name="xml_comando" Type="text" />
-          <Property Name="xml_retorno" Type="text" />
+          <Property Name="xml_comando" Type="varchar(max)" />
+          <Property Name="xml_retorno" Type="varchar(max)" />
           <Property Name="pdf_extrato" Type="varbinary(max)" />
           <Property Name="pdf_comprovante" Type="varbinary(max)" />
         </EntityType>
         <EntityContainer Name="roboModelStoreContainer">
           <EntitySet Name="tsiscomexweb_robo" EntityType="Self.tsiscomexweb_robo" Schema="dbo" store:Type="Tables" />
         </EntityContainer>
-      </Schema>
-    </edmx:StorageModels>
+      </Schema></edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema Namespace="roboModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
@@ -50,7 +49,7 @@
           <Property Name="tp_consulta" Type="String" MaxLength="2" FixedLength="false" Unicode="false" Nullable="false" />
           <Property Name="tp_acao" Type="String" MaxLength="15" FixedLength="false" Unicode="false" Nullable="false" />
           <Property Name="dt_agendamento" Type="DateTime" Precision="3" />
-          <Property Name="dt_realizacao" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="dt_realizacao" Type="DateTime" Precision="3" />
           <Property Name="dt_registro_di" Type="DateTime" Precision="3" />
           <Property Name="nr_tentativas" Type="Int32" Nullable="false" />
           <Property Name="tx_erro" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
@@ -72,38 +71,37 @@
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
     <edmx:Mappings>
-      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
-        <EntityContainerMapping StorageEntityContainer="roboModelStoreContainer" CdmEntityContainer="roboEntities">
-          <EntitySetMapping Name="tsiscomexweb_robo">
-            <EntityTypeMapping TypeName="roboModel.tsiscomexweb_robo">
-              <MappingFragment StoreEntitySet="tsiscomexweb_robo">
-                <ScalarProperty Name="nr_sequencia" ColumnName="nr_sequencia" />
-                <ScalarProperty Name="nr_processo" ColumnName="nr_processo" />
-                <ScalarProperty Name="nr_registro" ColumnName="nr_registro" />
-                <ScalarProperty Name="nr_seq" ColumnName="nr_seq" />
-                <ScalarProperty Name="tp_consulta" ColumnName="tp_consulta" />
-                <ScalarProperty Name="tp_acao" ColumnName="tp_acao" />
-                <ScalarProperty Name="dt_agendamento" ColumnName="dt_agendamento" />
-                <ScalarProperty Name="dt_realizacao" ColumnName="dt_realizacao" />
-                <ScalarProperty Name="dt_registro_di" ColumnName="dt_registro_di" />
-                <ScalarProperty Name="nr_tentativas" ColumnName="nr_tentativas" />
-                <ScalarProperty Name="tx_erro" ColumnName="tx_erro" />
-                <ScalarProperty Name="cd_usuario" ColumnName="cd_usuario" />
-                <ScalarProperty Name="cpf_certificado" ColumnName="cpf_certificado" />
-                <ScalarProperty Name="in_rodando" ColumnName="in_rodando" />
-                <ScalarProperty Name="in_desembaraco" ColumnName="in_desembaraco" />
-                <ScalarProperty Name="tp_anuencia" ColumnName="tp_anuencia" />
-                <ScalarProperty Name="in_situacao" ColumnName="in_situacao" />
-                <ScalarProperty Name="xml_comando" ColumnName="xml_comando" />
-                <ScalarProperty Name="xml_retorno" ColumnName="xml_retorno" />
-                <ScalarProperty Name="pdf_extrato" ColumnName="pdf_extrato" />
-                <ScalarProperty Name="pdf_comprovante" ColumnName="pdf_comprovante" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-        </EntityContainerMapping>
-      </Mapping>
-    </edmx:Mappings>
+    <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+  <EntityContainerMapping StorageEntityContainer="roboModelStoreContainer" CdmEntityContainer="roboEntities">
+    <EntitySetMapping Name="tsiscomexweb_robo">
+      <EntityTypeMapping TypeName="IsTypeOf(roboModel.tsiscomexweb_robo)">
+        <MappingFragment StoreEntitySet="tsiscomexweb_robo">
+          <ScalarProperty Name="nr_sequencia" ColumnName="nr_sequencia" />
+          <ScalarProperty Name="nr_processo" ColumnName="nr_processo" />
+          <ScalarProperty Name="nr_registro" ColumnName="nr_registro" />
+          <ScalarProperty Name="nr_seq" ColumnName="nr_seq" />
+          <ScalarProperty Name="tp_consulta" ColumnName="tp_consulta" />
+          <ScalarProperty Name="tp_acao" ColumnName="tp_acao" />
+          <ScalarProperty Name="dt_agendamento" ColumnName="dt_agendamento" />
+          <ScalarProperty Name="dt_realizacao" ColumnName="dt_realizacao" />
+          <ScalarProperty Name="dt_registro_di" ColumnName="dt_registro_di" />
+          <ScalarProperty Name="nr_tentativas" ColumnName="nr_tentativas" />
+          <ScalarProperty Name="tx_erro" ColumnName="tx_erro" />
+          <ScalarProperty Name="cd_usuario" ColumnName="cd_usuario" />
+          <ScalarProperty Name="cpf_certificado" ColumnName="cpf_certificado" />
+          <ScalarProperty Name="in_rodando" ColumnName="in_rodando" />
+          <ScalarProperty Name="in_desembaraco" ColumnName="in_desembaraco" />
+          <ScalarProperty Name="tp_anuencia" ColumnName="tp_anuencia" />
+          <ScalarProperty Name="in_situacao" ColumnName="in_situacao" />
+          <ScalarProperty Name="xml_comando" ColumnName="xml_comando" />
+          <ScalarProperty Name="xml_retorno" ColumnName="xml_retorno" />
+          <ScalarProperty Name="pdf_extrato" ColumnName="pdf_extrato" />
+          <ScalarProperty Name="pdf_comprovante" ColumnName="pdf_comprovante" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+  </EntityContainerMapping>
+</Mapping></edmx:Mappings>
   </edmx:Runtime>
   <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
   <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
@@ -117,7 +115,7 @@
         <DesignerProperty Name="ValidateOnBuild" Value="true" />
         <DesignerProperty Name="EnablePluralization" Value="false" />
         <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
-        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="UseLegacyProvider" Value="False" />
         <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
       </DesignerInfoPropertySet>
     </Options>

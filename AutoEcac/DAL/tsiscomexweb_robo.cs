@@ -21,7 +21,7 @@ namespace AutoEcac.DAL
         public string tp_consulta { get; set; }
         public string tp_acao { get; set; }
         public Nullable<System.DateTime> dt_agendamento { get; set; }
-        public System.DateTime dt_realizacao { get; set; }
+        public Nullable<System.DateTime> dt_realizacao { get; set; }
         public Nullable<System.DateTime> dt_registro_di { get; set; }
         public int nr_tentativas { get; set; }
         public string tx_erro { get; set; }
